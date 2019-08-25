@@ -108,6 +108,36 @@ int medianaGrau(int list[], int numVertices){
   }
 }
 
+int distancia(int v1, int v2){
+  //Define todos os visitados como -1;
+  memset(visited,false,MAXN);
+  //Define todas as distâncias como -1;
+  memset(path,-1,MAXN);
+  queue<int> fila;
+  //Visita o elemento start
+  visited[v1]=true;
+  //Adiciona o start a fila
+  fila.push(v1);
+  //Define a distância até o start em 0
+  path[v1]=0;
+  //Enquanto a fila não estiver vazia
+  while(!fila.empty()){
+    //Tira o primeiro elemento da fila
+    int v = fila.front();
+    fila.pop();
+    //Para todos os vizinhos da fila
+    for(int i=0;i<MAXN;i++){
+      //Se o vizinho tiver uma distância não definida
+      if(adjMatriz[v][i] != 0 && path[i]==-1){
+        //Altera a distância e adiciona ele na fila
+        path[i] = path[v]+1;
+        fila.push(i);
+      }
+    }
+  }
+  return path[v2];
+}
+
 int main(){
   int numVertices;
   int numArestas=0;
