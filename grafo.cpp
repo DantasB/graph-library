@@ -84,6 +84,23 @@ void DFSMatriz(int start){
   }
 }
 
+int grauMedio(int list[]){
+  int soma=0;
+  for(int i=0; i<MAXN;i++){
+    soma+= grau[i];
+  }
+  return soma/(MAXN-1);
+}
+
+int medianaGrau(int list[], int numVertices){
+  if (numVertices%2==0){
+    return (grau[(numVertices/2)]+ grau[(numVertices/2)+1])/2;
+  }
+  else{
+    return grau[(numVertices/2)+1];
+  }
+}
+
 int main(){
   int numVertices;
   int numArestas=0, soma=0;
@@ -108,10 +125,6 @@ int main(){
     numArestas++;
   }
 
-  for(int i=0;i<numVertices+1;i++){
-    soma +=grau[i];
-  }
-
   //Ordena em O(n.log(n)) o vetor de graus.
   sort(grau, grau+numVertices+1);
 
@@ -121,14 +134,9 @@ int main(){
   //O grau mínimo será o primeiro elemento +1 (o primeiro será sempre 0)
   cout<<"Esse é o grau mínimo: "<<grau[1]<<endl;
   //O grau médio será o somatorio de cada grau dividido pelo numero de graus
-  cout<<"Esse é o grau médio: "<<soma/numVertices<<endl;
+  cout<<"Esse é o grau médio: "<<grauMedio(grau)<<endl;
+  cout<<"Essa é a mediana do grau: "<<medianaGrau(grau, numVertices)<<endl;
 
-  if(numVertices%2==0){
-      cout<<"Essa é a mediana do grau: "<<(grau[(numVertices/2)]+ grau[(numVertices/2)+1])/2<<endl;
-  }
-  else{
-    cout<<"Essa é a mediana do grau: "<<grau[(numVertices/2)+1]<<endl;
-  }
   clock_t start = clock();
   DFSMatriz(1);
   clock_t end = clock();
