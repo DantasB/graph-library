@@ -138,6 +138,50 @@ int distancia(int v1, int v2){
   return path[v2];
 }
 
+void bfs(int start, int constante){
+  //Define todos os visitados como 0;
+  memset(visited,false,MAXN);
+  //Cria uma fila
+  queue<int> fila;
+  //Visita o elemento start
+  visited[start]=true;
+  //Adiciona o start a fila
+  fila.push(start);
+  cout<<start<<" ";
+  //Enquanto a fila não estiver vazia
+  while(!fila.empty()){
+    //Tira o primeiro elemento da fila
+    int v = fila.front();
+    fila.pop();
+    //Para todos os vizinhos da fila
+    for(int i=1;i<MAXN;i++){
+      //Se o vizinho não for visitado
+      if(adjMatriz[v][i] != 0 && (!visited[i])){
+        //visita o vizinho e adiciona ele na fila
+        visited[i] = true;
+        conexas[i]=constante;
+        cout<<i<<" ";
+        fila.push(i);
+      }
+    }
+  }
+  cout<<endl;
+}
+
+int numeroCCMatriz(bool vertices[][MAXN]){
+  memset(conexas, 0, MAXN);
+  int constante = 0;
+  int resultado = 0;
+  for(int i=1;i<MAXN;i++){
+    if (!visited[i]){
+      resultado++;
+      bfs(i,constante);
+      constante++;
+    }
+  }
+  return resultado;
+}
+
 int main(){
   int numVertices;
   int numArestas=0;
