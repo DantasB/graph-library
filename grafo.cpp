@@ -1,9 +1,24 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+int grauMedio(int *grau, size_t numVertices){
+  int soma=0;
+  for(int i=1; i<(int)numVertices+1;i++){
+    soma+= grau[i];
+  }
+  return soma/(numVertices-1);
+}
+
+int medianaGrau(int *grau, size_t numVertices){
+  if (numVertices%2==0){
+    return (grau[((int)numVertices/2)]+ grau[((int)numVertices/2)+1])/2;
+  }
+  else{
+    return grau[((int)numVertices/2)+1];
+  }
+}
+
 void bfsMatriz(int start, bool **adjMatriz, size_t numVertices){
-  ofstream bfsFile;
-  bfsFile.open("bfsFile.txt");
   //Cria um vetor de niveis
   int *nivel;
   nivel = new int[numVertices+1];
@@ -21,7 +36,6 @@ void bfsMatriz(int start, bool **adjMatriz, size_t numVertices){
   fila.push(start);
   //Define o Nivel do start como 0
   nivel[start]=0;
-  bfsFile<<"Vértice: "<< start <<", Nível: "<< nivel[start]<<", Pai: "<< pai[start]<<endl;
   //Enquanto a fila não estiver vazia
   while(!fila.empty()){
     //Tira o primeiro elemento da fila
@@ -34,10 +48,14 @@ void bfsMatriz(int start, bool **adjMatriz, size_t numVertices){
         //visita o vizinho e adiciona ele na fila
         nivel[i] = nivel[v]+1;
         pai[i] = v;
-        bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
         fila.push(i);
       }
     }
+  }
+  ofstream bfsFile;
+  bfsFile.open("bfsFile.txt");
+  for(int i=1;i<(int)numVertices+1;i++){
+    bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
   }
   bfsFile.close();
 }
@@ -94,23 +112,6 @@ void dfsMatriz(int start, bool **adjMatriz, size_t numVertices){
   dfsFile.close();
 }
 
-int grauMedio(int *grau, size_t numVertices){
-  int soma=0;
-  for(int i=1; i<(int)numVertices+1;i++){
-    soma+= grau[i];
-  }
-  return soma/(numVertices-1);
-}
-
-int medianaGrau(int *grau, size_t numVertices){
-  if (numVertices%2==0){
-    return (grau[((int)numVertices/2)]+ grau[((int)numVertices/2)+1])/2;
-  }
-  else{
-    return grau[((int)numVertices/2)+1];
-  }
-}
-
 int distanciaMatriz(int v1, int v2, bool **adjMatriz, size_t numVertices){
   //Cria um vetor distâncias
   int *path;
@@ -134,14 +135,16 @@ int distanciaMatriz(int v1, int v2, bool **adjMatriz, size_t numVertices){
         //Altera a distância e adiciona ele na fila
         path[i] = path[v]+1;
         fila.push(i);
+        if (i == v2){
+          return path[v2];
+        }
       }
     }
   }
   return path[v2];
 }
 
-//int diametroMatriz(){}
-
+/*
 void bfsCCMatriz(int start, bool **adjMatriz, size_t numVertices, int *conexas, int constante){
   //Cria uma fila
   queue<int> fila;
@@ -185,10 +188,9 @@ int numeroCCMatriz(bool **adjMatriz, size_t numVertices){
   }
   return resultado;
 }
+*/
 
-void bfsLista(int start, vector <int> *adjList, size_t numVertices){
-  ofstream bfsFile;
-  bfsFile.open("bfsFile.txt");
+void bfsVector(int start, vector <int> *adjVector, size_t numVertices){
   //Cria um vetor de niveis
   int *nivel;
   nivel = new int[numVertices+1];
@@ -206,28 +208,31 @@ void bfsLista(int start, vector <int> *adjList, size_t numVertices){
   fila.push(start);
   //Define o Nivel do start como 0
   nivel[start]=0;
-  bfsFile<<"Vértice: "<< start <<", Nível: "<< nivel[start]<<", Pai: "<< pai[start]<<endl;
   //Enquanto a fila não estiver vazia
   while(!fila.empty()){
     //Tira o primeiro elemento da fila
     int v = fila.front();
     fila.pop();
     //Para todos os vizinhos da fila
-    for(int i=1;i<(int)adjList[v].size();i++){
+    for(int i=1;i<(int)adjVector[v].size();i++){
       //Se o vizinho não for visitado
-      if((nivel[adjList[v][i]] == -1) && pai[adjList[v][i] == -1]){
+      if((nivel[adjVector[v][i]] == -1)){
         //visita o vizinho e adiciona ele na fila
-        nivel[adjList[v][i]] = nivel[v]+1;
-        pai[adjList[v][i]] = v;
-        bfsFile<< "Vértice: "<< adjList[v][i] <<", Nível: "<< nivel[adjList[v][i]]<<", Pai: "<< pai[adjList[v][i]]<<endl;
-        fila.push(adjList[v][i]);
+        nivel[adjVector[v][i]] = nivel[v]+1;
+        pai[adjVector[v][i]] = v;
+        fila.push(adjVector[v][i]);
       }
     }
+  }
+  ofstream bfsFile;
+  bfsFile.open("bfsFile.txt");
+  for(int i=1;i<(int)numVertices;i++){
+    bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
   }
   bfsFile.close();
 }
 
-int distanciaLista(int v1, int v2, vector <int> *adjList, size_t numVertices){
+int distanciaVector(int v1, int v2, vector <int> *adjVector, size_t numVertices){
   //Cria um vetor distâncias
   int *path;
   path = new int[numVertices+1];
@@ -244,23 +249,30 @@ int distanciaLista(int v1, int v2, vector <int> *adjList, size_t numVertices){
     int v = fila.front();
     fila.pop();
     //Para todos os vizinhos da fila
-    for(int i=1;i<(int)adjList[v].size();i++){
+    for(int i=1;i<(int)adjVector[v].size();i++){
       //Se o vizinho tiver uma distância não definida
-      if(path[adjList[v][i]]==-1){
+      if(path[adjVector[v][i]]==-1){
         //Altera a distância e adiciona ele na fila
-        path[adjList[v][i]] = path[v]+1;
-        fila.push(adjList[v][i]);
+        path[adjVector[v][i]] = path[v]+1;
+        fila.push(adjVector[v][i]);
+        /*if (adjVector[v][i] == v2){
+          return path[v2];
+        }*/
       }
     }
   }
   return path[v2];
 }
 
+/*void dfsVector(int start, vector <int> *adjVector, size_t numVertices){
+
+}*/
+
 int main(){
   int numVertices;
   bool **adjMatriz;
   int *grau;
-  vector <int> *adjList;
+  vector <int> *adjVector;
   int numArestas=0;
   int vertex1, vertex2;
   ifstream graphTexto("grafo.txt");
@@ -268,6 +280,7 @@ int main(){
   cout<<"Escolha uma representação:"<<endl;
   cout<<"Matriz de Adjacência (M)| Lista de Adjacência (L)"<<endl;
   cin>>escolha;
+
   //Esse é o próprio número de vértices
   graphTexto >> numVertices;
 
@@ -325,13 +338,13 @@ int main(){
 
   else if(escolha == 'L' || escolha == 'l'){
     //Cria a lista de adjacência
-    adjList = new vector<int>[numVertices+1];
+    adjVector = new vector<int>[numVertices+1];
     //Inicializa o vetor grau
     grau = new int[numVertices+1]();
     //Preenche a lista de adjacência
     while(graphTexto>>vertex1>>vertex2){
-      adjList[vertex1].push_back(vertex2);
-      adjList[vertex2].push_back(vertex1);
+      adjVector[vertex1].push_back(vertex2);
+      adjVector[vertex2].push_back(vertex1);
       //Calcula o grau de cada vértice
       grau[vertex1]++;
       grau[vertex2]++;
@@ -357,7 +370,7 @@ int main(){
     graphFile.close();
 
     clock_t start = clock();
-    bfsLista(1, adjList, numVertices);
+    bfsVector(1,adjVector, numVertices);
     clock_t end = clock();
     cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
   }
