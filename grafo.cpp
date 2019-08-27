@@ -201,7 +201,7 @@ int main(){
   cin>>escolha;
   //Esse é o próprio número de vértices
   graphTexto >> numVertices;
-  if (escolha =='M'){
+  if (escolha == 'M' || escolha == 'm'){
     //Cria a Matriz de Adjacência
     adjMatriz = new bool*[numVertices+1];
     for (int i = 0; i < numVertices+1; i++){
@@ -252,7 +252,7 @@ int main(){
     cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
     */
   }
-  else if(escolha == 'L'){
+  else if(escolha == 'L' || escolha == 'l'){
 
   }
   else{
