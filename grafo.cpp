@@ -227,6 +227,34 @@ void bfsLista(int start, vector <int> *adjList, size_t numVertices){
   bfsFile.close();
 }
 
+int distanciaLista(int v1, int v2, vector <int> *adjList, size_t numVertices){
+  //Cria um vetor distâncias
+  int *path;
+  path = new int[numVertices+1];
+  //Define todas as distâncias como -1;
+  memset(path,-1,numVertices);
+  queue<int> fila;
+  //Adiciona o start a fila
+  fila.push(v1);
+  //Define a distância até o start em 0
+  path[v1]=0;
+  //Enquanto a fila não estiver vazia
+  while(!fila.empty()){
+    //Tira o primeiro elemento da fila
+    int v = fila.front();
+    fila.pop();
+    //Para todos os vizinhos da fila
+    for(int i=1;i<(int)adjList[v].size();i++){
+      //Se o vizinho tiver uma distância não definida
+      if(path[adjList[v][i]]==-1){
+        //Altera a distância e adiciona ele na fila
+        path[adjList[v][i]] = path[v]+1;
+        fila.push(adjList[v][i]);
+      }
+    }
+  }
+  return path[v2];
+}
 
 int main(){
   int numVertices;
