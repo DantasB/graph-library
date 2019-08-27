@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-
 using namespace std;
 
 void bfsMatriz(int start, bool **adjMatriz, size_t numVertices){
@@ -187,6 +186,47 @@ int numeroCCMatriz(bool **adjMatriz, size_t numVertices){
   return resultado;
 }
 
+void bfsLista(int start, vector <int> *adjList, size_t numVertices){
+  ofstream bfsFile;
+  bfsFile.open("bfsFile.txt");
+  //Cria um vetor de niveis
+  int *nivel;
+  nivel = new int[numVertices+1];
+  //Cria um vetor de pais
+  int *pai;
+  pai = new int[numVertices+1];
+  //Define todos os níveis e pais como -1
+  for(int i=0;i<(int)numVertices+1;i++){
+    nivel[i]= -1;
+    pai[i]= -1;
+  }
+  //Cria uma fila
+  queue<int> fila;
+  //Adiciona o start a fila
+  fila.push(start);
+  //Define o Nivel do start como 0
+  nivel[start]=0;
+  bfsFile<<"Vértice: "<< start <<", Nível: "<< nivel[start]<<", Pai: "<< pai[start]<<endl;
+  //Enquanto a fila não estiver vazia
+  while(!fila.empty()){
+    //Tira o primeiro elemento da fila
+    int v = fila.front();
+    fila.pop();
+    //Para todos os vizinhos da fila
+    for(int i=1;i<(int)adjList[v].size();i++){
+      //Se o vizinho não for visitado
+      if((nivel[adjList[v][i]] == -1) && pai[adjList[v][i] == -1]){
+        //visita o vizinho e adiciona ele na fila
+        nivel[adjList[v][i]] = nivel[v]+1;
+        pai[adjList[v][i]] = v;
+        bfsFile<< "Vértice: "<< adjList[v][i] <<", Nível: "<< nivel[adjList[v][i]]<<", Pai: "<< pai[adjList[v][i]]<<endl;
+        fila.push(adjList[v][i]);
+      }
+    }
+  }
+  bfsFile.close();
+}
+
 
 int main(){
   int numVertices;
@@ -247,12 +287,12 @@ int main(){
     graphFile<<"Essa é a mediana do grau: "<<medianaGrau(grau, numVertices)<<endl;
 
     graphFile.close();
-  /*
+
     clock_t start = clock();
-    cout<<numeroCCMatriz(adjMatriz, numVertices)<<endl;
+    bfsMatriz(1, adjMatriz, numVertices);
     clock_t end = clock();
     cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
-    */
+
   }
 
   else if(escolha == 'L' || escolha == 'l'){
@@ -287,6 +327,11 @@ int main(){
     graphFile<<"Essa é a mediana do grau: "<<medianaGrau(grau, numVertices)<<endl;
 
     graphFile.close();
+
+    clock_t start = clock();
+    bfsLista(1, adjList, numVertices);
+    clock_t end = clock();
+    cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
   }
 
   else{
