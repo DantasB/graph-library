@@ -192,6 +192,7 @@ int main(){
   int numVertices;
   bool **adjMatriz;
   int *grau;
+  vector <int> *adjList;
   int numArestas=0;
   int vertex1, vertex2;
   ifstream graphTexto("grafo.txt");
@@ -201,7 +202,8 @@ int main(){
   cin>>escolha;
   //Esse é o próprio número de vértices
   graphTexto >> numVertices;
-  if (escolha == 'M' || escolha == 'm'){
+
+  if (escolha =='M'|| escolha == 'm'){
     //Cria a Matriz de Adjacência
     adjMatriz = new bool*[numVertices+1];
     for (int i = 0; i < numVertices+1; i++){
@@ -252,12 +254,44 @@ int main(){
     cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
     */
   }
-  else if(escolha == 'L' || escolha == 'l'){
 
+  else if(escolha == 'L' || escolha == 'l'){
+    //Cria a lista de adjacência
+    adjList = new vector<int>[numVertices+1];
+    //Inicializa o vetor grau
+    grau = new int[numVertices+1]();
+    //Preenche a lista de adjacência
+    while(graphTexto>>vertex1>>vertex2){
+      adjList[vertex1].push_back(vertex2);
+      adjList[vertex2].push_back(vertex1);
+      //Calcula o grau de cada vértice
+      grau[vertex1]++;
+      grau[vertex2]++;
+      //Calcula o número de arestas
+      numArestas++;
+    }
+    //Ordena o vetor grau em O(nlog(n))
+    sort(grau, grau+numVertices+1);
+
+    ofstream graphFile;
+    graphFile.open("graphFile.txt");
+
+    graphFile<< "Esse é o número de vértices: "<<numVertices<<endl;
+    graphFile<< "Esse é o número de arestas: "<<numArestas<<endl;
+    //Após ordenado, o grau máximo é o ultimo elemento da lista
+    graphFile<< "Esse é o grau máximo: "<<grau[numVertices]<<endl;
+    //O grau mínimo será o primeiro elemento +1 (o primeiro será sempre 0)
+    graphFile<< "Esse é o grau mínimo: "<<grau[1]<<endl;
+    //O grau médio será o somatorio de cada grau dividido pelo numero de graus
+    graphFile<< "Esse é o grau médio: "<<grauMedio(grau, numVertices)<<endl;
+    graphFile<<"Essa é a mediana do grau: "<<medianaGrau(grau, numVertices)<<endl;
+
+    graphFile.close();
   }
+
   else{
     cout<<"Essa representação não existe"<<endl;
   }
+
   return 0;
 }
-
