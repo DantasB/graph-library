@@ -26,7 +26,7 @@ void bfsMatriz(int start, bool **adjMatriz, size_t numVertices){
   int *pai;
   pai = new int[numVertices+1];
   //Define todos os níveis e pais como -1
-  for(int i=0;i<(int)numVertices+1;i++){
+  for(int i=1;i<(int)numVertices+1;i++){
     nivel[i]= -1;
     pai[i]= -1;
   }
@@ -44,7 +44,7 @@ void bfsMatriz(int start, bool **adjMatriz, size_t numVertices){
     //Para todos os vizinhos da fila
     for(int i=1;i<(int)numVertices+1;i++){
       //Se o vizinho não for visitado
-      if(adjMatriz[v][i] != 0 && (nivel[i] == -1)){
+      if(adjMatriz[v][i] && nivel[i]==-1){
         //visita o vizinho e adiciona ele na fila
         nivel[i] = nivel[v]+1;
         pai[i] = v;
@@ -129,15 +129,15 @@ int distanciaMatriz(int v1, int v2, bool **adjMatriz, size_t numVertices){
     int v = fila.front();
     fila.pop();
     //Para todos os vizinhos da fila
-    for(int i=1;i<(int)numVertices;i++){
+    for(int i=1;i<(int)numVertices+1;i++){
       //Se o vizinho tiver uma distância não definida
       if(adjMatriz[v][i] != 0 && path[i]==-1){
         //Altera a distância e adiciona ele na fila
+        if (i == v2){
+          return path[v] + 1;
+        }
         path[i] = path[v]+1;
         fila.push(i);
-        if (i == v2){
-          return path[v2];
-        }
       }
     }
   }
@@ -214,7 +214,7 @@ void bfsVector(int start, vector <int> *adjVector, size_t numVertices){
     int v = fila.front();
     fila.pop();
     //Para todos os vizinhos da fila
-    for(int i=1;i<(int)adjVector[v].size();i++){
+    for(int i=0;i<(int)adjVector[v].size();i++){
       //Se o vizinho não for visitado
       if((nivel[adjVector[v][i]] == -1)){
         //visita o vizinho e adiciona ele na fila
@@ -226,7 +226,7 @@ void bfsVector(int start, vector <int> *adjVector, size_t numVertices){
   }
   ofstream bfsFile;
   bfsFile.open("bfsFile.txt");
-  for(int i=1;i<(int)numVertices;i++){
+  for(int i=1;i<(int)numVertices+1;i++){
     bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
   }
   bfsFile.close();
@@ -255,9 +255,9 @@ int distanciaVector(int v1, int v2, vector <int> *adjVector, size_t numVertices)
         //Altera a distância e adiciona ele na fila
         path[adjVector[v][i]] = path[v]+1;
         fila.push(adjVector[v][i]);
-        /*if (adjVector[v][i] == v2){
+        if (adjVector[v][i] == v2){
           return path[v2];
-        }*/
+        }
       }
     }
   }
@@ -330,7 +330,7 @@ int main(){
     graphFile.close();
 
     clock_t start = clock();
-    bfsMatriz(1, adjMatriz, numVertices);
+    cout<<distanciaMatriz(10,20,adjMatriz,numVertices)<<endl;
     clock_t end = clock();
     cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
 
@@ -351,6 +351,7 @@ int main(){
       //Calcula o número de arestas
       numArestas++;
     }
+
     //Ordena o vetor grau em O(nlog(n))
     sort(grau, grau+numVertices+1);
 
@@ -370,7 +371,7 @@ int main(){
     graphFile.close();
 
     clock_t start = clock();
-    bfsVector(1,adjVector, numVertices);
+    cout<<distanciaVector(10,20,adjVector,numVertices)<<endl;
     clock_t end = clock();
     cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
   }
@@ -381,3 +382,4 @@ int main(){
 
   return 0;
 }
+
