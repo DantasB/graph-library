@@ -143,7 +143,7 @@ int distanciaMatriz(int v1, int v2, bool **adjMatriz, size_t numVertices){
 
 //int diametroMatriz(){}
 
-void bfs(int start, bool **adjMatriz, size_t numVertices, int *conexas, int constante){
+void bfsCCMatriz(int start, bool **adjMatriz, size_t numVertices, int *conexas, int constante){
   //Cria uma fila
   queue<int> fila;
   //Visita o elemento start
@@ -195,58 +195,69 @@ int main(){
   int numArestas=0;
   int vertex1, vertex2;
   ifstream graphTexto("grafo.txt");
-
+  char escolha;
+  cout<<"Escolha uma representação:"<<endl;
+  cout<<"Matriz de Adjacência (M)| Lista de Adjacência (L)"<<endl;
+  cin>>escolha;
   //Esse é o próprio número de vértices
   graphTexto >> numVertices;
-
-  //Cria a Matriz de Adjacência
-  adjMatriz = new bool*[numVertices+1];
-  for (int i = 0; i < numVertices+1; i++){
-        adjMatriz[i] = new bool[numVertices+1];
-  }
-
-  //Zera a Matriz de Adjacência
-  for (int i=0;i < numVertices+1; i++){
-    for(int j=0;j< numVertices+1;j++){
-        adjMatriz[i][j] = false;
+  if (escolha =='M'){
+    //Cria a Matriz de Adjacência
+    adjMatriz = new bool*[numVertices+1];
+    for (int i = 0; i < numVertices+1; i++){
+          adjMatriz[i] = new bool[numVertices+1];
     }
-  }
-  //Cria um vetor de graus
-  grau = new int[numVertices+1]();
-  //Preenche a Matriz de Adjacência
-  while(graphTexto>>vertex1>>vertex2){
-    //Insere o par (vértice1, vértice2) na matriz
-    adjMatriz[vertex1][vertex2]=true;
-    adjMatriz[vertex2][vertex1]=true;
-    //Calcula o grau de cada vértice
-    grau[vertex1]++;
-    grau[vertex2]++;
-    //Calcula o número de arestas
-    numArestas++;
-  }
 
-  //Ordena em O(n.log(n)) o vetor de graus.
-  sort(grau, grau+numVertices+1);
+    //Zera a Matriz de Adjacência
+    for (int i=0;i < numVertices+1; i++){
+      for(int j=0;j< numVertices+1;j++){
+          adjMatriz[i][j] = false;
+      }
+    }
+    //Cria um vetor de graus
+    grau = new int[numVertices+1]();
+    //Preenche a Matriz de Adjacência
+    while(graphTexto>>vertex1>>vertex2){
+      //Insere o par (vértice1, vértice2) na matriz
+      adjMatriz[vertex1][vertex2]=true;
+      adjMatriz[vertex2][vertex1]=true;
+      //Calcula o grau de cada vértice
+      grau[vertex1]++;
+      grau[vertex2]++;
+      //Calcula o número de arestas
+      numArestas++;
+    }
 
-  ofstream graphFile;
-  graphFile.open("graphFile.txt");
+    //Ordena em O(n.log(n)) o vetor de graus.
+    sort(grau, grau+numVertices+1);
 
-  graphFile<< "Esse é o número de vértices: "<<numVertices<<endl;
-  graphFile<< "Esse é o número de arestas: "<<numArestas<<endl;
-  //Após ordenado, o grau máximo é o ultimo elemento da lista
-  graphFile<< "Esse é o grau máximo: "<<grau[numVertices]<<endl;
-  //O grau mínimo será o primeiro elemento +1 (o primeiro será sempre 0)
-  graphFile<< "Esse é o grau mínimo: "<<grau[1]<<endl;
-  //O grau médio será o somatorio de cada grau dividido pelo numero de graus
-  graphFile<< "Esse é o grau médio: "<<grauMedio(grau, numVertices)<<endl;
-  graphFile<<"Essa é a mediana do grau: "<<medianaGrau(grau, numVertices)<<endl;
+    ofstream graphFile;
+    graphFile.open("graphFile.txt");
 
-  graphFile.close();
+    graphFile<< "Esse é o número de vértices: "<<numVertices<<endl;
+    graphFile<< "Esse é o número de arestas: "<<numArestas<<endl;
+    //Após ordenado, o grau máximo é o ultimo elemento da lista
+    graphFile<< "Esse é o grau máximo: "<<grau[numVertices]<<endl;
+    //O grau mínimo será o primeiro elemento +1 (o primeiro será sempre 0)
+    graphFile<< "Esse é o grau mínimo: "<<grau[1]<<endl;
+    //O grau médio será o somatorio de cada grau dividido pelo numero de graus
+    graphFile<< "Esse é o grau médio: "<<grauMedio(grau, numVertices)<<endl;
+    graphFile<<"Essa é a mediana do grau: "<<medianaGrau(grau, numVertices)<<endl;
+
+    graphFile.close();
   /*
-  clock_t start = clock();
-  cout<<numeroCCMatriz(adjMatriz, numVertices)<<endl;
-  clock_t end = clock();
-  cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
-  */
+    clock_t start = clock();
+    cout<<numeroCCMatriz(adjMatriz, numVertices)<<endl;
+    clock_t end = clock();
+    cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
+    */
+  }
+  else if(escolha == 'L'){
+
+  }
+  else{
+    cout<<"Essa representação não existe"<<endl;
+  }
+  return 0;
 }
 
