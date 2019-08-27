@@ -180,7 +180,7 @@ int numeroCCMatriz(bool **adjMatriz, size_t numVertices){
   for(int i=1;i<(int)numVertices+1;i++){
     if (conexas[i]==-1){
       resultado++;
-      bfs(i, adjMatriz, numVertices, conexas, constante);
+      bfsCCMatriz(i, adjMatriz, numVertices, conexas, constante);
       constante++;
     }
   }
