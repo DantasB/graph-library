@@ -189,9 +189,50 @@ void bfsVector(int start, vector <int> *adjVector, size_t numVertices){
   bfsFile.close();
 }
 
-/*void dfsVector(int start, vector <int> *adjVector, size_t numVertices){
-
-}*/
+void dfsVector(int start, vector <int> *adjVector, size_t numVertices){
+  //Cria um vetor de niveis
+  int *nivel;
+  nivel = new int[numVertices+1];
+  //Cria um vetor de pais
+  int *pai;
+  pai = new int[numVertices+1];
+  //Cria um vetor de visitados
+  bool *visited;
+  visited = new bool[numVertices+1];
+  //Define todos os níveis e pais como -1 e visitados como 0
+  for(int i=0;i<(int)numVertices+1;i++){
+    nivel[i]= -1;
+    pai[i]= -2;
+    visited[i] = 0;
+  }
+  //Cria uma pilha
+  stack <int> pilha;
+  //Adiciona start a pilha;
+  pilha.push(start);
+  //Define o Nivel do start como 0
+  nivel[start]=0;
+  pai[start]=-1;
+  while (pilha.empty()!= 1){
+    int u = pilha.top();
+    pilha.pop();
+    if (visited[u] == 0){
+        visited[u] = 1;
+        for (int i=0;i<(int)adjVector[u].size();i++){
+            if(pai[adjVector[u][i]]==-2){
+              pilha.push(adjVector[u][i]);
+              nivel[adjVector[u][i]] = nivel[u]+1;
+              pai[adjVector[u][i]] = u;
+            }
+        }
+    }
+  }
+  ofstream dfsFile;
+  dfsFile.open("dfsFile.txt");
+    for(int i=1;i<(int)numVertices+1;i++){
+        dfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+  }
+  dfsFile.close();
+}
 
 int distanciaVector(int v1, int v2, vector <int> *adjVector, size_t numVertices){
   //Cria um vetor distâncias
