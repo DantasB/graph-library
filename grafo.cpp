@@ -63,8 +63,6 @@ void bfsMatriz(int start, bool **adjMatriz, size_t numVertices){
 }
 
 void dfsMatriz(int start, bool **adjMatriz, size_t numVertices){
-  ofstream dfsFile;
-  dfsFile.open("dfsFile.txt");
   //Cria um vetor de niveis
   int *nivel;
   nivel = new int[numVertices+1];
@@ -77,7 +75,7 @@ void dfsMatriz(int start, bool **adjMatriz, size_t numVertices){
   //Define todos os níveis e pais como -1 e visitados como 0
   for(int i=0;i<(int)numVertices+1;i++){
     nivel[i]= -1;
-    pai[i]= -1;
+    pai[i]= -2;
     visited[i] = 0;
   }
   //Cria uma pilha
@@ -86,7 +84,7 @@ void dfsMatriz(int start, bool **adjMatriz, size_t numVertices){
   pilha.push(start);
   //Define o Nivel do start como 0
   nivel[start]=0;
-  dfsFile<< "Vértice: "<< start <<", Nível: "<< nivel[start]<<", Pai: "<< pai[start]<<endl;
+  pai[start]=-1;
   //Enquanto a pilha não estiver vazia
   while(!pilha.empty()){
     //Retira o elemento do topo da pilha
@@ -100,10 +98,9 @@ void dfsMatriz(int start, bool **adjMatriz, size_t numVertices){
       for(int v=0; v<(int)numVertices+1; v++){
         if(adjMatriz[u][v]!=0){
           //Se o vértice ainda não tem um pai
-          if (pai[v]==-1){
+          if (pai[v]==-2){
             pai[v] = u;
             nivel[v] = nivel[u]+1;
-            dfsFile<< "Vértice: "<< v <<", Nível: "<< nivel[v]<<", Pai: "<< pai[v]<<endl;
           }
           //Adiciona a vizinhança a pilha
           pilha.push(v);
@@ -111,9 +108,14 @@ void dfsMatriz(int start, bool **adjMatriz, size_t numVertices){
       }
     }
   }
+
+  ofstream dfsFile;
+  dfsFile.open("dfsFile.txt");
+  for(int i=1;i<(int)numVertices+1;i++){
+    dfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+  }
   dfsFile.close();
 }
-
 int distanciaMatriz(int v1, int v2, bool **adjMatriz, size_t numVertices){
   //Cria um vetor distâncias
   int *path;
