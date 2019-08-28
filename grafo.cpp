@@ -287,7 +287,7 @@ int main(){
   ifstream graphTexto("grafo.txt");
   char escolha;
   cout<<"Escolha uma representação:"<<endl;
-  cout<<"Matriz de Adjacência (M)| Lista de Adjacência (V)"<<endl;
+  cout<<"Matriz de Adjacência (M)| Vetor de Adjacência (V)"<<endl;
   cin>>escolha;
 
   //Esse é o próprio número de vértices
