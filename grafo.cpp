@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+//Funções para ambas as representações
 int grauMedio(int *grau, size_t numVertices){
   int soma=0;
   for(int i=1; i<(int)numVertices+1;i++){
@@ -18,6 +19,7 @@ int medianaGrau(int *grau, size_t numVertices){
   }
 }
 
+//Funções para Matriz de Adjacência
 void bfsMatriz(int start, bool **adjMatriz, size_t numVertices){
   //Cria um vetor de niveis
   int *nivel;
@@ -144,52 +146,7 @@ int distanciaMatriz(int v1, int v2, bool **adjMatriz, size_t numVertices){
   return path[v2];
 }
 
-/*
-void bfsCCMatriz(int start, bool **adjMatriz, size_t numVertices, int *conexas, int constante){
-  //Cria uma fila
-  queue<int> fila;
-  //Visita o elemento start
-  conexas[start]=constante;
-  //Adiciona o start a fila
-  fila.push(start);
-  //Enquanto a fila não estiver vazia
-  while(!fila.empty()){
-    //Tira o primeiro elemento da fila
-    int v = fila.front();
-    fila.pop();
-    //Para todos os vizinhos da fila
-    for(int i=1;i<(int)numVertices+1;i++){
-      //Se o vizinho não for visitado
-      if(adjMatriz[v][i] != 0 && (conexas[i]==-1)){
-        //visita o vizinho e adiciona ele na fila
-        conexas[i]=constante;
-        fila.push(i);
-      }
-    }
-  }
-}
-
-int numeroCCMatriz(bool **adjMatriz, size_t numVertices){
-  //Cria um vetor de componentes conexas
-  int *conexas;
-  conexas = new int[numVertices+1];
-  //Define todos as conexas como -1
-  for(int i=0;i<(int)numVertices+1;i++){
-  conexas[i]=-1;
-}
-  int constante = 0;
-  int resultado = 0;
-  for(int i=1;i<(int)numVertices+1;i++){
-    if (conexas[i]==-1){
-      resultado++;
-      bfsCCMatriz(i, adjMatriz, numVertices, conexas, constante);
-      constante++;
-    }
-  }
-  return resultado;
-}
-*/
-
+//Funções para Vetor de Adjacência
 void bfsVector(int start, vector <int> *adjVector, size_t numVertices){
   //Cria um vetor de niveis
   int *nivel;
@@ -232,6 +189,10 @@ void bfsVector(int start, vector <int> *adjVector, size_t numVertices){
   bfsFile.close();
 }
 
+/*void dfsVector(int start, vector <int> *adjVector, size_t numVertices){
+
+}*/
+
 int distanciaVector(int v1, int v2, vector <int> *adjVector, size_t numVertices){
   //Cria um vetor distâncias
   int *path;
@@ -264,9 +225,57 @@ int distanciaVector(int v1, int v2, vector <int> *adjVector, size_t numVertices)
   return path[v2];
 }
 
-/*void dfsVector(int start, vector <int> *adjVector, size_t numVertices){
+/*
+void bfs(int start, vector <int> *adjVector, size_t numVertices, int mark[],
+  int constante, vector <int> nextconexo){
+  //Cria um vetor de visitados
+  int *visit;
+  visit = new int[numVertices+1];
+  //Define todos os visitados como 0
+  memset(visit, false, numVertices+1);
+  //Cria uma fila
+  queue<int> fila;
+  //Adiciona o start a fila
+  fila.push(start);
+  //Define o Nivel do start como 0
+  visit[start]=1;
+  mark[start]=constante;
+  //Enquanto a fila não estiver vazia
+  while(!fila.empty()){
+    //Tira o primeiro elemento da fila
+    int v = fila.front();
+    fila.pop();
+    //Para todos os vizinhos da fila
+    for(int i=0;i<(int)adjVector[v].size();i++){
+      //Se o vizinho não for visitado
+      if(!visit[adjVector[v][i]]){
+        //visita o vizinho e adiciona ele na fila
+        visit[adjVector[v][i]]=true;
+        mark[adjVector[v][i]]=constante;
+        fila.push(adjVector[v][i]);
+      }
+    }
+  }
+}
 
-}*/
+void componentesConexas(vector <int> *adjVector, size_t numVertices){
+  //Cria um vetor marcação
+  vector <int> nextconexo;
+  for(int i=numVertices;i>0;i--){
+    nextconexo.push_back(i);
+  }
+  int *mark;
+  mark = new int[numVertices+1];
+  memset(mark,-1,numVertices+1);
+
+  int constante = 0;
+  for(int i=1;i<(int)nextconexo.size();i++){
+    int vertex = nextconexo.back();
+    nextconexo.pop_back();
+    bfs(vertex, adjVector, numVertices, mark, constante, nextconexo);
+  }
+}
+*/
 
 int main(){
   int numVertices;
@@ -336,12 +345,12 @@ int main(){
 
   }
 
-  else if(escolha == 'L' || escolha == 'l'){
-    //Cria a lista de adjacência
+  else if(escolha == 'V' || escolha == 'v'){
+    //Cria o vetor de adjacência
     adjVector = new vector<int>[numVertices+1];
     //Inicializa o vetor grau
     grau = new int[numVertices+1]();
-    //Preenche a lista de adjacência
+    //Preenche o vetor de adjacência
     while(graphTexto>>vertex1>>vertex2){
       adjVector[vertex1].push_back(vertex2);
       adjVector[vertex2].push_back(vertex1);
@@ -382,4 +391,3 @@ int main(){
 
   return 0;
 }
-
