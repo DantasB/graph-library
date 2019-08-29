@@ -237,7 +237,7 @@ void dfsMatriz(int start, grafoMatriz grafo){
       //Visita o topo da pilha
       visited[u] = true;
       //Para todas as vizinhanças do topo da pilha
-      for(int v=0; v<(int)grafo.numVertices+1; v++){
+      for(int v=1; v<(int)grafo.numVertices+1; v++){
         if(grafo.adjMatriz[u][v]!=0){
           //Se o vértice ainda não tem um pai
           if (pai[v]==-1){
@@ -424,10 +424,10 @@ void dfsVector(int start, grafoVector grafo){
         visited[u] = 1;
         for (int i=0;i<(int)grafo.adjVector[u].size();i++){
             if(pai[grafo.adjVector[u][i]]==-1){
-              pilha.push(grafo.adjVector[u][i]);
               nivel[grafo.adjVector[u][i]] = nivel[u]+1;
               pai[grafo.adjVector[u][i]] = u;
             }
+            pilha.push(grafo.adjVector[u][i]);
         }
     }
   }
