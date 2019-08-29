@@ -433,14 +433,12 @@ void bfsVector(int start, grafoVector grafo){
       }
     }
   }
-  /*
   ofstream bfsFile;
   bfsFile.open("bfsFile.txt");
   for(int i=1;i<(int)grafo.numVertices+1;i++){
     bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
   }
   bfsFile.close();
-  */
 }
 
 void dfsVector(int start, grafoVector grafo){
