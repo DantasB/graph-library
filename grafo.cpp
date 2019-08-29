@@ -170,17 +170,16 @@ void bfsMatriz(int start, grafoMatriz grafo){
   //Define todos os níveis e pais como -1
   for(int i=0;i<(int)grafo.numVertices+1;i++){
     nivel[i]=-1;
-    pai[i]=-1;
   }
   //memset(nivel, -1, grafo.numVertices+1);
-  //memset(pai, 0, grafo.numVertices+1);
+  memset(pai, 0, grafo.numVertices+1);
   //Cria uma fila
   queue<int> fila;
   //Adiciona o start a fila
   fila.push(start);
   //Define o Nivel do start como 0
   nivel[start]=0;
-  pai[start]=0;
+  pai[start]=-1;
   //Enquanto a fila não estiver vazia
   while(!fila.empty()){
     //Tira o primeiro elemento da fila
@@ -218,10 +217,9 @@ void dfsMatriz(int start, grafoMatriz grafo){
   //Define todos os níveis e pais como -1 e visitados como 0
   for(int i=0;i<(int)grafo.numVertices+1;i++){
     nivel[i]=-1;
-    pai[i]=-1;
   }
   //memset(nivel,-1, grafo.numVertices+1);
-  //memset(pai,-1, grafo.numVertices+1);
+  memset(pai,0, grafo.numVertices+1);
   memset(visited,0,grafo.numVertices+1);
   //Cria uma pilha
   stack <int> pilha;
@@ -229,7 +227,7 @@ void dfsMatriz(int start, grafoMatriz grafo){
   pilha.push(start);
   //Define o Nivel do start como 0
   nivel[start]=0;
-  pai[start]=0;
+  pai[start]=-1;
   //Enquanto a pilha não estiver vazia
   while(!pilha.empty()){
     //Retira o elemento do topo da pilha
@@ -243,7 +241,7 @@ void dfsMatriz(int start, grafoMatriz grafo){
       for(int v=1; v<(int)grafo.numVertices+1; v++){
         if(grafo.adjMatriz[u][v]!=0){
           //Se o vértice ainda não tem um pai
-          if (pai[v]==-1){
+          if (pai[v]==0){
             pai[v] = u;
             nivel[v] = nivel[u]+1;
           }
@@ -403,36 +401,42 @@ void bfsVector(int start, grafoVector grafo){
   //Cria um vetor de pais
   int *pai;
   pai = new int[grafo.numVertices+1];
-  //Define todos os níveis e pais como -1
+  //Define todos os níveiscomo -1
   for(int i=0;i<(int)grafo.numVertices+1;i++){
     nivel[i]=-1;
-    pai[i]=-1;
   }
-  //memset(nivel, -1, grafo.numVertices+1);
-  //memset(pai, 0, grafo.numVertices+1);
+  //Define o vetor pai como 0
+  memset(pai, 0, grafo.numVertices+1);
   //Cria uma fila
   queue<int> fila;
-  //Adiciona o start a fila
-  fila.push(start);
-  //Define o Nivel do start como 0
-  nivel[start]=0;
-  pai[start]=0;
-  //Enquanto a fila não estiver vazia
-  while(!fila.empty()){
-    //Tira o primeiro elemento da fila
-    int v = fila.front();
-    fila.pop();
-    //Para todos os vizinhos da fila
-    for(int i=0;i<(int)grafo.adjVector[v].size();i++){
-      //Se o vizinho não for visitado
-      if((nivel[grafo.adjVector[v][i]] == -1)){
-        //visita o vizinho e adiciona ele na fila
-        nivel[grafo.adjVector[v][i]] = nivel[v]+1;
-        pai[grafo.adjVector[v][i]] = v;
-        fila.push(grafo.adjVector[v][i]);
+  //for(int start=1;start<=1000;start++){
+    //Adiciona o start a fila
+    fila.push(start);
+    //Define o Nivel do start como 0
+    nivel[start]=0;
+    pai[start]=-1;
+    //Enquanto a fila não estiver vazia
+    while(!fila.empty()){
+      //Tira o primeiro elemento da fila
+      int v = fila.front();
+      fila.pop();
+      //Para todos os vizinhos da fila
+      for(int i=0;i<(int)grafo.adjVector[v].size();i++){
+        //Se o vizinho não for visitado
+        if((nivel[grafo.adjVector[v][i]] == -1)){
+          //visita o vizinho e adiciona ele na fila
+          nivel[grafo.adjVector[v][i]] = nivel[v]+1;
+          pai[grafo.adjVector[v][i]] = v;
+          fila.push(grafo.adjVector[v][i]);
+        }
       }
     }
-  }
+    //Define todos os níveis e pais como -1
+    //for(int i=0;i<(int)grafo.numVertices+1;i++){
+      //nivel[i]=-1;
+      //pai[i]=-1;
+    //}
+  //}
   ofstream bfsFile;
   bfsFile.open("bfsFile.txt");
   for(int i=1;i<(int)grafo.numVertices+1;i++){
@@ -451,36 +455,42 @@ void dfsVector(int start, grafoVector grafo){
   //Cria um vetor de visitados
   bool *visited;
   visited = new bool[grafo.numVertices+1];
-  //Define todos os níveis e pais como -1 e visitados como 0
+  //Define todos os níveis e pais como -1
   for(int i=0;i<(int)grafo.numVertices+1;i++){
     nivel[i]=-1;
-    pai[i]=-1;
   }
   //memset(nivel,-1,grafo.numVertices+1);
-  //memset(pai,-1,grafo.numVertices+1);
+  memset(pai,0,grafo.numVertices+1);
   memset(visited,0,grafo.numVertices+1);
 
   //Cria uma pilha
   stack <int> pilha;
   //Adiciona start a pilha;
-  pilha.push(start);
-  //Define o Nivel do start como 0
-  nivel[start]=0;
-  pai[start]=0;
-  while (pilha.empty()!= 1){
-    int u = pilha.top();
-    pilha.pop();
-    if (visited[u] == 0){
-        visited[u] = 1;
-        for (int i=0;i<(int)grafo.adjVector[u].size();i++){
-            if(pai[grafo.adjVector[u][i]]==-1){
-              nivel[grafo.adjVector[u][i]] = nivel[u]+1;
-              pai[grafo.adjVector[u][i]] = u;
-            }
-            pilha.push(grafo.adjVector[u][i]);
-        }
+  //for(int start=1;start<=1000;start++){
+    pilha.push(start);
+    //Define o Nivel do start como 0
+    nivel[start]=0;
+    pai[start]=-1;
+    while (pilha.empty()!= 1){
+      int u = pilha.top();
+      pilha.pop();
+      if (visited[u] == 0){
+          visited[u] = 1;
+          for (int i=0;i<(int)grafo.adjVector[u].size();i++){
+              if(pai[grafo.adjVector[u][i]]==0){
+                nivel[grafo.adjVector[u][i]] = nivel[u]+1;
+                pai[grafo.adjVector[u][i]] = u;
+              }
+              pilha.push(grafo.adjVector[u][i]);
+          }
+      }
     }
-  }
+    //for(int i=0;i<(int)grafo.numVertices+1;i++){
+      //nivel[i]=-1;
+      //pai[i]=-1;
+    //}
+    //memset(visited,0,grafo.numVertices+1);
+  //}
   ofstream dfsFile;
   dfsFile.open("dfsFile.txt");
     for(int i=1;i<(int)grafo.numVertices+1;i++){
@@ -572,12 +582,13 @@ void componentesConexasVector(){}
 */
 
 int main(){
-  grafoVector vector = constroiVector("live_journal.txt");
+  grafoVector vector = constroiVector("dblp.txt");
   //grafoMatriz matriz = constroiMatriz("as_graph.txt");
   clock_t start = clock();
-  bfsVector(1,vector);
-  //bfsMatriz(1,matriz);
+  dfsVector(1, vector);
+  //dfsMatriz(1, matriz);
   clock_t end = clock();
   cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
 }
+
 
