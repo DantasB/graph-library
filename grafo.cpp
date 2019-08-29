@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <string.h>
+#include <list>
 
 using namespace std;
 
@@ -35,8 +36,10 @@ grafoVector constroiVector(string arquivo){
   grafo.numVertices = numVertices;
   //Cria o vetor de adjacência
   adjVector = new vector<int>[numVertices+1];
+
   //Inicializa o vetor grau
   grau = new int[numVertices+1]();
+
   //Preenche o vetor de adjacência
   while(graphTexto>>vertex1>>vertex2){
     adjVector[vertex1].push_back(vertex2);
@@ -167,7 +170,7 @@ void bfsMatriz(int start, grafoMatriz grafo){
   //Define todos os níveis e pais como -1
   for(int i=0;i<(int)grafo.numVertices+1;i++){
     nivel[i]=-1;
-    pai[i]=0;
+    pai[i]=-1;
   }
   //memset(nivel, -1, grafo.numVertices+1);
   //memset(pai, 0, grafo.numVertices+1);
@@ -177,6 +180,7 @@ void bfsMatriz(int start, grafoMatriz grafo){
   fila.push(start);
   //Define o Nivel do start como 0
   nivel[start]=0;
+  pai[start]=0;
   //Enquanto a fila não estiver vazia
   while(!fila.empty()){
     //Tira o primeiro elemento da fila
@@ -215,11 +219,10 @@ void dfsMatriz(int start, grafoMatriz grafo){
   for(int i=0;i<(int)grafo.numVertices+1;i++){
     nivel[i]=-1;
     pai[i]=-1;
-    visited[i]=0;
   }
   //memset(nivel,-1, grafo.numVertices+1);
   //memset(pai,-1, grafo.numVertices+1);
-  //memset(visited,0,grafo.numVertices+1);
+  memset(visited,0,grafo.numVertices+1);
   //Cria uma pilha
   stack <int> pilha;
   //Adiciona start a pilha;
@@ -264,7 +267,9 @@ int distanciaMatriz(int v1, int v2, grafoMatriz grafo){
   int *path;
   path = new int[grafo.numVertices+1];
   //Define todas as distâncias como -1;
-  memset(path,-1,grafo.numVertices);
+  for(int i=0;i<(int)grafo.numVertices;i++){
+    path[i]=-1;
+  }
   queue<int> fila;
   //Adiciona o start a fila
   fila.push(v1);
@@ -298,13 +303,10 @@ int diametroMatriz(grafoMatriz grafo){
     //Cria um vetor de niveis
     int *nivel;
     nivel = new int[grafo.numVertices+1];
-    //Cria um vetor de pais
-    int *pai;
-    pai = new int[grafo.numVertices+1];
-    //Define todos os níveis e pais como -1
+    //Define todos os níveis -1
+
     for(int i=0;i<(int)grafo.numVertices+1;i++){
       nivel[i]=-1;
-      pai[i]=0;
     }
     //Cria uma fila
     queue <int> fila;
@@ -327,7 +329,6 @@ int diametroMatriz(grafoMatriz grafo){
           if(grafo.adjMatriz[v][i] && nivel[i]==-1){
             //visita o vizinho e adiciona ele na fila
             nivel[i] = nivel[v]+1;
-            pai[i] = v;
             fila.push(i);
           }
         }
@@ -335,14 +336,63 @@ int diametroMatriz(grafoMatriz grafo){
 
       for(int i=0;i<(int)grafo.numVertices+1;i++){
         nivel[i]=-1;
-        pai[i]=0;
       }
     }
     return maiornivel;
 }
 
 /*
-void componentesConexasMatriz(){}
+void bfsCCMatriz(int start, grafoMatriz grafo, int constante, int visited[]){
+  //Cria um vetor de niveis
+
+  //Cria uma fila
+  queue<int> fila;
+  //Adiciona o start a fila
+  fila.push(start);
+  //Define o Nivel do start como 0
+  visited[start]=constante;
+  //Enquanto a fila não estiver vazia
+  while(!fila.empty()){
+    //Tira o primeiro elemento da fila
+    int v = fila.front();
+    fila.pop();
+    //Para todos os vizinhos da fila
+    for(int i=1;i<(int)grafo.numVertices+1;i++){
+      //Se o vizinho não for visitado
+      if(grafo.adjMatriz[v][i] && visited[i]<0){
+        //visita o vizinho e adiciona ele na fila
+        visited[i] = constante;
+        fila.push(i);
+      }
+    }
+  }
+}
+*/
+
+/*
+void componentesConexasMatriz(grafoMatriz grafo){
+  list <int>*conexos;
+  conexos = new list<int>;
+  int *pointerVector;
+  pointerVector = new int[grafo.numVertices+1];
+  for(int i=1;i<(int)grafo.numVertices+1;i++){
+    conexos.push_front(i);
+    pointerVector[i]= &conexos.front();
+  }
+
+  int constante = 0;
+  int *visited;
+  visited = new int[grafo.numVertices+1];
+  for(int i=0;i<(int)grafo.numVertices+1;i++){
+    visited[i]=-1;
+  }
+  for(int i=1;i<(int)conexos.size();i++){
+    int start = conexos.front();
+    conexos.pop_front();
+    bfsCCMatriz(start,grafo,constante, visited);
+    constante++;
+  }
+}
 */
 
 //Funções para Vetor de Adjacência
@@ -356,7 +406,7 @@ void bfsVector(int start, grafoVector grafo){
   //Define todos os níveis e pais como -1
   for(int i=0;i<(int)grafo.numVertices+1;i++){
     nivel[i]=-1;
-    pai[i]=0;
+    pai[i]=-1;
   }
   //memset(nivel, -1, grafo.numVertices+1);
   //memset(pai, 0, grafo.numVertices+1);
@@ -366,6 +416,7 @@ void bfsVector(int start, grafoVector grafo){
   fila.push(start);
   //Define o Nivel do start como 0
   nivel[start]=0;
+  pai[start]=0;
   //Enquanto a fila não estiver vazia
   while(!fila.empty()){
     //Tira o primeiro elemento da fila
@@ -382,12 +433,14 @@ void bfsVector(int start, grafoVector grafo){
       }
     }
   }
+  /*
   ofstream bfsFile;
   bfsFile.open("bfsFile.txt");
   for(int i=1;i<(int)grafo.numVertices+1;i++){
     bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
   }
   bfsFile.close();
+  */
 }
 
 void dfsVector(int start, grafoVector grafo){
@@ -404,11 +457,10 @@ void dfsVector(int start, grafoVector grafo){
   for(int i=0;i<(int)grafo.numVertices+1;i++){
     nivel[i]=-1;
     pai[i]=-1;
-    visited[i]=0;
   }
   //memset(nivel,-1,grafo.numVertices+1);
   //memset(pai,-1,grafo.numVertices+1);
-  //memset(visited,0,grafo.numVertices+1);
+  memset(visited,0,grafo.numVertices+1);
 
   //Cria uma pilha
   stack <int> pilha;
@@ -444,7 +496,9 @@ int distanciaVector(int v1, int v2, grafoVector grafo){
   int *path;
   path = new int[grafo.numVertices+1];
   //Define todas as distâncias como -1;
-  memset(path,-1,grafo.numVertices);
+  for(int i=0;i<(int)grafo.numVertices;i++){
+    path[i]=-1;
+  }
   queue<int> fila;
   //Adiciona o start a fila
   fila.push(v1);
@@ -478,13 +532,9 @@ int diametroVector(grafoVector grafo){
     //Cria um vetor de niveis
     int *nivel;
     nivel = new int[grafo.numVertices+1];
-    //Cria um vetor de pais
-    int *pai;
-    pai = new int[grafo.numVertices+1];
-    //Define todos os níveis e pais como -1
+    //Define todos os níveis -1
     for(int i=0;i<(int)grafo.numVertices+1;i++){
       nivel[i]=-1;
-      pai[i]=0;
     }
     //Cria uma fila
     queue <int> fila;
@@ -507,7 +557,6 @@ int diametroVector(grafoVector grafo){
           if((nivel[grafo.adjVector[v][i]] == -1)){
             //visita o vizinho e adiciona ele na fila
             nivel[grafo.adjVector[v][i]] = nivel[v]+1;
-            pai[grafo.adjVector[v][i]] = v;
             fila.push(grafo.adjVector[v][i]);
           }
         }
@@ -515,7 +564,6 @@ int diametroVector(grafoVector grafo){
 
       for(int i=0;i<(int)grafo.numVertices+1;i++){
         nivel[i]=-1;
-        pai[i]=0;
       }
     }
     return maiornivel;
@@ -526,11 +574,12 @@ void componentesConexasVector(){}
 */
 
 int main(){
-  //grafoVector vector = constroiVector("grafo.txt");
-  grafoMatriz matriz = constroiMatriz("grafo.txt");
+  grafoVector vector = constroiVector("live_journal.txt");
+  //grafoMatriz matriz = constroiMatriz("as_graph.txt");
   clock_t start = clock();
-  //cout<<diametroVector(vector)<<endl;
-  bfsMatriz(1,matriz);
+  bfsVector(1,vector);
+  //bfsMatriz(1,matriz);
   clock_t end = clock();
   cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
 }
+
