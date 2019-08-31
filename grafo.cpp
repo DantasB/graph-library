@@ -468,7 +468,7 @@ void dfsVector(grafoVector grafo){
   //Cria uma pilha
   stack <int> pilha;
   //Adiciona start a pilha;
-  for(int start=1;start<=1000;start++){
+  //for(int start=1;start<=1000;start++){
     pilha.push(start);
     //Define o Nivel do start como 0
     nivel[start]=0;
@@ -487,20 +487,18 @@ void dfsVector(grafoVector grafo){
           }
       }
     }
-    for(int i=0;i<(int)grafo.numVertices+1;i++){
-      nivel[i]=-1;
-    }
-    memset(pai,0,grafo.numVertices+1);
-    memset(visited,0,grafo.numVertices+1);
-  }
-  /*
+    //for(int i=0;i<(int)grafo.numVertices+1;i++){
+      //nivel[i]=-1;
+    //}
+    //memset(pai,0,grafo.numVertices+1);
+    //memset(visited,0,grafo.numVertices+1);
+  //}
   ofstream dfsFile;
   dfsFile.open("dfsFile.txt");
     for(int i=1;i<(int)grafo.numVertices+1;i++){
         dfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
   }
   dfsFile.close();
-  */
 }
 
 int distanciaVector(int v1, int v2, grafoVector grafo){
