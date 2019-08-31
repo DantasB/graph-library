@@ -447,7 +447,7 @@ void bfsVector(int start, grafoVector grafo){
 
 }
 
-void dfsVector(grafoVector grafo){
+void dfsVector(int start, grafoVector grafo){
   //Cria um vetor de niveis
   int *nivel;
   nivel = new int[grafo.numVertices+1];
@@ -587,10 +587,10 @@ void componentesConexasVector(){}
 */
 
 int main(){
-  grafoVector vector = constroiVector("live_journal.txt");
+  grafoVector vector = constroiVector("as_graph.txt");
   //grafoMatriz matriz = constroiMatriz("as_graph.txt");
   clock_t start = clock();
-  dfsVector(vector);
+  dfsVector(1, vector);
   //cout<<distanciaVector(1,4,vector)<<endl;
   //dfsMatriz(1, matriz);
   clock_t end = clock();
