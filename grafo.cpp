@@ -624,7 +624,7 @@ int diametroVector(grafoVector grafo){
 }
 
 void bfsCCVertice(int start, grafoVector grafo, int constante, int visited[],
-  vector<int*> pointerVector, list<int>conexos, vector<int> *conectados){
+  vector<int*> pointerVector, list<int>conexos/*, vector<int> *conectados*/){
   //Cria uma fila
   queue<int> fila;
   //Adiciona o start a fila
@@ -633,8 +633,9 @@ void bfsCCVertice(int start, grafoVector grafo, int constante, int visited[],
   visited[start]=constante;
   //Cria um iterator com a posição de memória a ser retirada
   auto it = pointerVector[start-1];
+  //cout<<"Esse é o elemento start: "<<*it<< ". De posição: "<<it<<endl;
   //Adiciona a um vector de conectados (para imprimir depois a lista)
-  conectados[constante].push_back(*it);
+  //conectados[constante].push_back(*it);
   //Retira o valor de it-1 da lista de conexos
   conexos.remove(*it-1);
   //Enquanto a fila não estiver vazia
@@ -648,11 +649,12 @@ void bfsCCVertice(int start, grafoVector grafo, int constante, int visited[],
       if(visited[grafo.adjVector[v][i]]<0){
         //Retira o elemento da lista de conexos
         it = pointerVector[grafo.adjVector[v][i]-1];
+        cout<<"Esse é o elemento visitado: "<<*it<< ". De posição: "<<it<<endl;
         conexos.remove(*it);
         //Visita ele
         visited[grafo.adjVector[v][i]] = constante;
         //Adiciona ele ao vector de conectados
-        conectados[constante].push_back(*it);
+        //conectados[constante].push_back(*it);
         //Adiciona ele na fila
         fila.push(grafo.adjVector[v][i]);
       }
@@ -662,8 +664,8 @@ void bfsCCVertice(int start, grafoVector grafo, int constante, int visited[],
 
 int componentesConexasVertice(grafoVector grafo){
   //Cria um vector conectados
-  vector<int> *conectados;
-  conectados = new vector<int>[(int)grafo.numVertices+1];
+  /*vector<int> *conectados;
+  conectados = new vector<int>[(int)grafo.numVertices+1];*/
   //Cria uma lista de conexos
   list<int>conexos;
   //Cria um vector de ponteiros
@@ -685,7 +687,7 @@ int componentesConexasVertice(grafoVector grafo){
     visited[i]=-1;
   }
   //Enquanto tiver vertices na lista de conexos
-  for(int i=1;i<(int)conexos.size();i++){
+  while(!conexos.empty()){
     //Pega o ponteiro do ultimo elemento do vector de ponteiros
     auto value = pointerVector.back();
     //Pega a posição dele
@@ -695,7 +697,8 @@ int componentesConexasVertice(grafoVector grafo){
       //Soma 1 a constante
       constante++;
       //Roda uma bfs com começo no start
-      bfsCCVertice(*start,grafo,constante, visited, pointerVector, conexos, conectados);
+      bfsCCVertice(*start,grafo,constante, visited, pointerVector, conexos/*, conectados*/);
+      //cout<<"Esse é o tamanho do vetor de conexos: "<< conexos.size()<<endl;
     }
   }
   /*
