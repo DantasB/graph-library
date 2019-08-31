@@ -375,7 +375,7 @@ void componentesConexasMatriz(grafoMatriz grafo){
   pointerVector = new int[grafo.numVertices+1];
   for(int i=1;i<(int)grafo.numVertices+1;i++){
     conexos.push_front(i);
-    pointerVector[i]= &conexos.front();
+    pointerVector[i]= &conexosfront();
   }
 
   int constante = 0;
@@ -437,15 +437,17 @@ void bfsVector(int start, grafoVector grafo){
       //pai[i]=-1;
     //}
   //}
+
   ofstream bfsFile;
   bfsFile.open("bfsFile.txt");
   for(int i=1;i<(int)grafo.numVertices+1;i++){
     bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
   }
   bfsFile.close();
+
 }
 
-void dfsVector(int start, grafoVector grafo){
+void dfsVector(grafoVector grafo){
   //Cria um vetor de niveis
   int *nivel;
   nivel = new int[grafo.numVertices+1];
@@ -466,7 +468,7 @@ void dfsVector(int start, grafoVector grafo){
   //Cria uma pilha
   stack <int> pilha;
   //Adiciona start a pilha;
-  //for(int start=1;start<=1000;start++){
+  for(int start=1;start<=1000;start++){
     pilha.push(start);
     //Define o Nivel do start como 0
     nivel[start]=0;
@@ -485,18 +487,20 @@ void dfsVector(int start, grafoVector grafo){
           }
       }
     }
-    //for(int i=0;i<(int)grafo.numVertices+1;i++){
-      //nivel[i]=-1;
-      //pai[i]=-1;
-    //}
-    //memset(visited,0,grafo.numVertices+1);
-  //}
+    for(int i=0;i<(int)grafo.numVertices+1;i++){
+      nivel[i]=-1;
+    }
+    memset(pai,0,grafo.numVertices+1);
+    memset(visited,0,grafo.numVertices+1);
+  }
+  /*
   ofstream dfsFile;
   dfsFile.open("dfsFile.txt");
     for(int i=1;i<(int)grafo.numVertices+1;i++){
         dfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
   }
   dfsFile.close();
+  */
 }
 
 int distanciaVector(int v1, int v2, grafoVector grafo){
@@ -518,17 +522,20 @@ int distanciaVector(int v1, int v2, grafoVector grafo){
     int v = fila.front();
     fila.pop();
     //Para todos os vizinhos da fila
-    for(int i=1;i<(int)grafo.adjVector[v].size();i++){
+    for(int i=0;i<(int)grafo.adjVector[v].size();i++){
       //Se o vizinho tiver uma distância não definida
       if(path[grafo.adjVector[v][i]]==-1){
         //Altera a distância e adiciona ele na fila
+        if (grafo.adjVector[v][i] == v2){
+          return path[v] + 1;
+        }
         path[grafo.adjVector[v][i]] = path[v]+1;
         fila.push(grafo.adjVector[v][i]);
-        if (grafo.adjVector[v][i] == v2){
-          return path[v2];
-        }
       }
     }
+  }
+  for(int i=0;i<grafo.numVertices+1;i++){
+    cout<<path[i]<<endl;
   }
   return path[v2];
 }
@@ -582,13 +589,12 @@ void componentesConexasVector(){}
 */
 
 int main(){
-  grafoVector vector = constroiVector("dblp.txt");
+  grafoVector vector = constroiVector("live_journal.txt");
   //grafoMatriz matriz = constroiMatriz("as_graph.txt");
   clock_t start = clock();
-  dfsVector(1, vector);
+  dfsVector(vector);
+  //cout<<distanciaVector(1,4,vector)<<endl;
   //dfsMatriz(1, matriz);
   clock_t end = clock();
   cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
 }
-
-
