@@ -339,16 +339,20 @@ int diametroMatriz(grafoMatriz grafo){
     return maiornivel;
 }
 
-/*
-void bfsCCMatriz(int start, grafoMatriz grafo, int constante, int visited[]){
-  //Cria um vetor de niveis
-
+void bfsCCMatriz(int start, grafoMatriz grafo, int constante, int visited[],
+  vector<int*> pointerVector, list<int>conexos, vector<int> *conectados){
   //Cria uma fila
   queue<int> fila;
   //Adiciona o start a fila
   fila.push(start);
-  //Define o Nivel do start como 0
+  //O start agora terá um label associado (constante)
   visited[start]=constante;
+  //Cria um iterator com a posição de memória a ser retirada
+  auto it = pointerVector[start-1];
+  //Adiciona a um vector de conectados (para imprimir depois a lista)
+  conectados[constante].push_back(*it);
+  //Retira o valor de it-1 da lista de conexos
+  conexos.remove(*it-1);
   //Enquanto a fila não estiver vazia
   while(!fila.empty()){
     //Tira o primeiro elemento da fila
@@ -358,40 +362,78 @@ void bfsCCMatriz(int start, grafoMatriz grafo, int constante, int visited[]){
     for(int i=1;i<(int)grafo.numVertices+1;i++){
       //Se o vizinho não for visitado
       if(grafo.adjMatriz[v][i] && visited[i]<0){
-        //visita o vizinho e adiciona ele na fila
+        //Retira o elemento da lista de conexos
+        it = pointerVector[i-1];
+        conexos.remove(*it);
+        //Visita ele
         visited[i] = constante;
+        //Adiciona ele ao vector de conectados
+        conectados[constante].push_back(*it);
+        //Adiciona ele na fila
         fila.push(i);
       }
     }
   }
 }
-*/
 
-/*
-void componentesConexasMatriz(grafoMatriz grafo){
-  list <int>*conexos;
-  conexos = new list<int>;
-  int *pointerVector;
-  pointerVector = new int[grafo.numVertices+1];
-  for(int i=1;i<(int)grafo.numVertices+1;i++){
-    conexos.push_front(i);
-    pointerVector[i]= &conexosfront();
+int componentesConexasMatriz(grafoMatriz grafo){
+  //Cria um array de vector conectados
+  vector<int> *conectados;
+  conectados = new vector<int>[(int)grafo.numVertices+1];
+  //Cria uma lista de conexos
+  list<int>conexos;
+  //Cria um vector de ponteiros
+  vector<int*> pointerVector;
+  /*Preenche os conexos com os vértices do grafo e o
+   vetor de pointeiros com suas posições */
+  for(int i=1;i<=(int)grafo.numVertices;i++){
+    conexos.push_back(i);
+    pointerVector.push_back(&conexos.back());
   }
-
+  //Inicia um iterator
+  auto start = conexos.end();
+  //Inicia uma constante (valor do label usado no array de visitados)
   int constante = 0;
+  //Cria um array de visitados e preenche com -1
   int *visited;
   visited = new int[grafo.numVertices+1];
-  for(int i=0;i<(int)grafo.numVertices+1;i++){
+  for(int i=1;i<(int)grafo.numVertices+1;i++){
     visited[i]=-1;
   }
+  //Enquanto tiver vertices na lista de conexos
   for(int i=1;i<(int)conexos.size();i++){
-    int start = conexos.front();
-    conexos.pop_front();
-    bfsCCMatriz(start,grafo,constante, visited);
-    constante++;
+    //Pega o ponteiro do ultimo elemento do vector de ponteiros
+    auto value = pointerVector.back();
+    //Pega a posição dele
+    std::advance(start, *value);
+    //Se não tiver sido visitado
+    if(visited[*start]==-1){
+      //Soma 1 a constante
+      constante++;
+      //Roda uma bfs com começo no start
+      bfsCCMatriz(*start,grafo,constante, visited, pointerVector, conexos, conectados);
+    }
   }
+  /*
+  for(int i=grafo.numVertices; i>=1;i--){
+    cout<<visited[i]<<endl;
+  }
+  ofstream conectedComponents;
+  conectedComponents.open("conectedComponents.txt");
+  conectedComponents<<endl;
+  for(int i=1; i < (int)grafo.numVertices; i++){
+    if((int)conectados[i].size()>0){
+      conectedComponents<<"Vertices com marcação "<<i<<": "<<endl;
+      for(int j=0;j < (int)conectados[i].size();j++){
+        conectedComponents<<conectados[i][j]<<" ";
+      }
+      conectedComponents<<endl;
+    }
+  }
+  conectedComponents<<"Números de componentes conexas: "<<constante;
+  */
+  return constante;
 }
-*/
 
 //Funções para Vetor de Adjacência
 void bfsVector(int start, grafoVector grafo){
@@ -437,7 +479,6 @@ void bfsVector(int start, grafoVector grafo){
       //pai[i]=-1;
     //}
   //}
-
   ofstream bfsFile;
   bfsFile.open("bfsFile.txt");
   for(int i=1;i<(int)grafo.numVertices+1;i++){
@@ -582,17 +623,111 @@ int diametroVector(grafoVector grafo){
     return maiornivel;
 }
 
-/*
-void componentesConexasVector(){}
-*/
+void bfsCCVertice(int start, grafoVector grafo, int constante, int visited[],
+  vector<int*> pointerVector, list<int>conexos, vector<int> *conectados){
+  //Cria uma fila
+  queue<int> fila;
+  //Adiciona o start a fila
+  fila.push(start);
+  //O start agora terá um label associado (constante)
+  visited[start]=constante;
+  //Cria um iterator com a posição de memória a ser retirada
+  auto it = pointerVector[start-1];
+  //Adiciona a um vector de conectados (para imprimir depois a lista)
+  conectados[constante].push_back(*it);
+  //Retira o valor de it-1 da lista de conexos
+  conexos.remove(*it-1);
+  //Enquanto a fila não estiver vazia
+  while(!fila.empty()){
+    //Tira o primeiro elemento da fila
+    int v = fila.front();
+    fila.pop();
+    //Para todos os vizinhos da fila
+    for(int i=0;i<(int)grafo.adjVector[v].size();i++){
+      //Se o vizinho não for visitado
+      if(visited[grafo.adjVector[v][i]]<0){
+        //Retira o elemento da lista de conexos
+        it = pointerVector[grafo.adjVector[v][i]-1];
+        conexos.remove(*it);
+        //Visita ele
+        visited[grafo.adjVector[v][i]] = constante;
+        //Adiciona ele ao vector de conectados
+        conectados[constante].push_back(*it);
+        //Adiciona ele na fila
+        fila.push(grafo.adjVector[v][i]);
+      }
+    }
+  }
+}
 
+int componentesConexasVertice(grafoVector grafo){
+  //Cria um vector conectados
+  vector<int> *conectados;
+  conectados = new vector<int>[(int)grafo.numVertices+1];
+  //Cria uma lista de conexos
+  list<int>conexos;
+  //Cria um vector de ponteiros
+  vector<int*> pointerVector;
+  /*Preenche os conexos com os vértices do grafo e o
+   vetor de pointeiros com suas posições */
+  for(int i=1;i<=(int)grafo.numVertices;i++){
+    conexos.push_back(i);
+    pointerVector.push_back(&conexos.back());
+  }
+  //Inicia um iterator
+  auto start = conexos.end();
+  //Inicia uma constante (valor do label usado no array de visitados)
+  int constante = 0;
+  //Cria um array de visitados e preenche com -1
+  int *visited;
+  visited = new int[grafo.numVertices+1];
+  for(int i=1;i<(int)grafo.numVertices+1;i++){
+    visited[i]=-1;
+  }
+  //Enquanto tiver vertices na lista de conexos
+  for(int i=1;i<(int)conexos.size();i++){
+    //Pega o ponteiro do ultimo elemento do vector de ponteiros
+    auto value = pointerVector.back();
+    //Pega a posição dele
+    std::advance(start, *value);
+    //Se não tiver sido visitado
+    if(visited[*start]==-1){
+      //Soma 1 a constante
+      constante++;
+      //Roda uma bfs com começo no start
+      bfsCCVertice(*start,grafo,constante, visited, pointerVector, conexos, conectados);
+    }
+  }
+  /*
+  for(int i=grafo.numVertices; i>=1;i--){
+    cout<<visited[i]<<endl;
+  }
+
+  ofstream conectedComponents;
+  conectedComponents.open("conectedComponents.txt");
+  conectedComponents<<endl;
+  for(int i=1; i < (int)grafo.numVertices; i++){
+    if((int)conectados[i].size()>0){
+      conectedComponents<<"Vertices com marcação "<<i<<": "<<endl;
+      for(int j=0;j < (int)conectados[i].size();j++){
+        conectedComponents<<conectados[i][j]<<" ";
+      }
+      conectedComponents<<endl;
+    }
+  }
+  conectedComponents<<"Números de componentes conexas: "<<constante;
+  */
+  return constante;
+}
+
+//Utilização pelo usuário(main)
 int main(){
-  grafoVector vector = constroiVector("as_graph.txt");
+  grafoVector vector = constroiVector("dblp.txt");
   //grafoMatriz matriz = constroiMatriz("as_graph.txt");
   clock_t start = clock();
-  dfsVector(1, vector);
+  cout<<componentesConexasVertice(vector)<<endl;
   //cout<<distanciaVector(1,4,vector)<<endl;
-  //dfsMatriz(1, matriz);
+  //bfsVector(1, vector);
   clock_t end = clock();
   cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
 }
