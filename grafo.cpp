@@ -7,7 +7,6 @@
 #include <vector>
 #include <algorithm>
 #include <string.h>
-#include <list>
 
 using namespace std;
 
@@ -21,6 +20,11 @@ struct grafoMatriz{
   int numVertices;
   bool **adjMatriz;
 };
+
+//Funções extras
+bool comparaCC(vector<int> &primeiro, vector<int> &segundo){
+   return primeiro.size() > segundo.size();
+}
 
 //Funções de construção das estruturas de dados
 grafoVector constroiVector(string arquivo){
@@ -296,8 +300,7 @@ int distanciaMatriz(int v1, int v2, grafoMatriz grafo){
 
 int diametroMatriz(grafoMatriz grafo){
     //Cria uma constante maior nível
-    int maiornivel;
-    maiornivel =0;
+    int maiornivel=0;
     //Cria um vetor de niveis
     int *nivel;
     nivel = new int[grafo.numVertices+1];
@@ -339,99 +342,69 @@ int diametroMatriz(grafoMatriz grafo){
     return maiornivel;
 }
 
-void bfsCCMatriz(int start, grafoMatriz grafo, int constante, int visited[],
-  vector<int*> pointerVector, list<int>conexos, vector<int> *conectados){
+vector<int> bfsCCMatriz(grafoMatriz grafo, int start, vector<int>&descoberto, int constante){
+  //Cria um vector de componentes e adiciona o vertice que está iniciando a bfs
+  vector<int> componentesMatriz;
+  componentesMatriz.push_back(start);
   //Cria uma fila
   queue<int> fila;
+  //Seta o start como descoberto
+  descoberto[start] = constante;
   //Adiciona o start a fila
   fila.push(start);
-  //O start agora terá um label associado (constante)
-  visited[start]=constante;
-  //Cria um iterator com a posição de memória a ser retirada
-  auto it = pointerVector[start-1];
-  //Adiciona a um vector de conectados (para imprimir depois a lista)
-  conectados[constante].push_back(*it);
-  //Retira o valor de it-1 da lista de conexos
-  conexos.remove(*it-1);
   //Enquanto a fila não estiver vazia
-  while(!fila.empty()){
-    //Tira o primeiro elemento da fila
-    int v = fila.front();
+  while (!fila.empty()) {
+    //Pega o primeiro elemento da fila
+    int vertex = fila.front();
     fila.pop();
-    //Para todos os vizinhos da fila
-    for(int i=1;i<(int)grafo.numVertices+1;i++){
-      //Se o vizinho não for visitado
-      if(grafo.adjMatriz[v][i] && visited[i]<0){
-        //Retira o elemento da lista de conexos
-        it = pointerVector[i-1];
-        conexos.remove(*it);
-        //Visita ele
-        visited[i] = constante;
-        //Adiciona ele ao vector de conectados
-        conectados[constante].push_back(*it);
-        //Adiciona ele na fila
-        fila.push(i);
+    //Faz um iterator dos vizinhos da fila.front()
+    for (int i=1;i<(int)grafo.numVertices+1;i++){
+      //Vizinho é o *it
+      int vizinho = i;
+      //Se esse vizinho não tiver sido descoberto
+      if (!descoberto[vizinho] && grafo.adjMatriz[vertex][vizinho]) {
+        //Vizinho pertence a mesma componente conexa do start
+        descoberto[vizinho] = constante;
+        //Adiciona o vizinho ao final do vector de componentes
+        componentesMatriz.push_back(vizinho);
+        //Adiciona o vizinho a fila
+        fila.push(vizinho);
       }
     }
   }
+  //Retorna o componentes Matriz para adicionar a lista de componentes conexas
+  return componentesMatriz;
 }
 
 int componentesConexasMatriz(grafoMatriz grafo){
-  //Cria um array de vector conectados
-  vector<int> *conectados;
-  conectados = new vector<int>[(int)grafo.numVertices+1];
-  //Cria uma lista de conexos
-  list<int>conexos;
-  //Cria um vector de ponteiros
-  vector<int*> pointerVector;
-  /*Preenche os conexos com os vértices do grafo e o
-   vetor de pointeiros com suas posições */
-  for(int i=1;i<=(int)grafo.numVertices;i++){
-    conexos.push_back(i);
-    pointerVector.push_back(&conexos.back());
-  }
-  //Inicia um iterator
-  auto start = conexos.end();
-  //Inicia uma constante (valor do label usado no array de visitados)
+  //Cria um vector de tamanho numVertices+1 e seta todos como 0
+  vector <int> descoberto (grafo.numVertices+1, 0);
+  //Cria um vector de vector com as componente conexas do grafo
+  vector < vector <int> > verticesCC;
+  //Seta uma constante como 0
   int constante = 0;
-  //Cria um array de visitados e preenche com -1
-  int *visited;
-  visited = new int[grafo.numVertices+1];
-  for(int i=1;i<(int)grafo.numVertices+1;i++){
-    visited[i]=-1;
-  }
-  //Enquanto tiver vertices na lista de conexos
-  for(int i=1;i<(int)conexos.size();i++){
-    //Pega o ponteiro do ultimo elemento do vector de ponteiros
-    auto value = pointerVector.back();
-    //Pega a posição dele
-    std::advance(start, *value);
-    //Se não tiver sido visitado
-    if(visited[*start]==-1){
-      //Soma 1 a constante
+  //Para todos os vértices do grafo
+  for(int i = 1; i < grafo.numVertices+1; i++) {
+    //Se o vértice não foi descoberto
+    if (!descoberto[i]){
+      //Adiciona 1 a constante (será o label dessa componente conexa)
       constante++;
-      //Roda uma bfs com começo no start
-      bfsCCMatriz(*start,grafo,constante, visited, pointerVector, conexos, conectados);
+      //Roda uma bfs para essa componente conexa e adiciona ao VerticesCC
+      verticesCC.push_back( bfsCCMatriz(grafo, i , descoberto, constante));
     }
   }
-  /*
-  for(int i=grafo.numVertices; i>=1;i--){
-    cout<<visited[i]<<endl;
-  }
-  ofstream conectedComponents;
-  conectedComponents.open("conectedComponents.txt");
-  conectedComponents<<endl;
-  for(int i=1; i < (int)grafo.numVertices; i++){
-    if((int)conectados[i].size()>0){
-      conectedComponents<<"Vertices com marcação "<<i<<": "<<endl;
-      for(int j=0;j < (int)conectados[i].size();j++){
-        conectedComponents<<conectados[i][j]<<" ";
-      }
-      conectedComponents<<endl;
+  ofstream saida;
+  saida.open("connectedComponents.txt");
+  saida << "Número de componentes conexas: "<<verticesCC.size()<<"\n"<<endl;
+  sort(verticesCC.begin(), verticesCC.end(), comparaCC);
+  for (int i = 0; i < (int)verticesCC.size(); i++) {
+    saida <<"Tamanho da "<<i+1<<"ª Componente conexa: "<< verticesCC[i].size()<<endl;
+    saida <<"Abaixo estão os vértices que a compõem:"<<endl;
+    for(int j=0; j< (int)verticesCC[i].size();j++){
+      saida <<verticesCC[i][j]<<" ";
     }
+    saida<<endl;
   }
-  conectedComponents<<"Números de componentes conexas: "<<constante;
-  */
   return constante;
 }
 
@@ -581,8 +554,7 @@ int distanciaVector(int v1, int v2, grafoVector grafo){
 
 int diametroVector(grafoVector grafo){
     //Cria uma constante maior nível
-    int maiornivel;
-    maiornivel =0;
+    int maiornivel=0;
     //Cria um vetor de niveis
     int *nivel;
     nivel = new int[grafo.numVertices+1];
@@ -623,113 +595,79 @@ int diametroVector(grafoVector grafo){
     return maiornivel;
 }
 
-void bfsCCVertice(int start, grafoVector grafo, int constante, int visited[],
-  vector<int*> pointerVector, list<int>conexos/*, vector<int> *conectados*/){
+vector<int> bfsCCVector(grafoVector grafo, int start, vector<int>&descoberto, int constante){
+  //Cria um vector de componentes e adiciona o vertice que está iniciando a bfs
+  vector<int> componentesVector;
+  componentesVector.push_back(start);
   //Cria uma fila
   queue<int> fila;
+  //Seta o start como descoberto
+  descoberto[start] = constante;
   //Adiciona o start a fila
   fila.push(start);
-  //O start agora terá um label associado (constante)
-  visited[start]=constante;
-  //Cria um iterator com a posição de memória a ser retirada
-  auto it = pointerVector[start-1];
-  //cout<<"Esse é o elemento start: "<<*it<< ". De posição: "<<it<<endl;
-  //Adiciona a um vector de conectados (para imprimir depois a lista)
-  //conectados[constante].push_back(*it);
-  //Retira o valor de it-1 da lista de conexos
-  conexos.remove(*it-1);
   //Enquanto a fila não estiver vazia
-  while(!fila.empty()){
-    //Tira o primeiro elemento da fila
-    int v = fila.front();
+  while (!fila.empty()) {
+    //Pega o primeiro elemento da fila
+    int vertex = fila.front();
     fila.pop();
-    //Para todos os vizinhos da fila
-    for(int i=0;i<(int)grafo.adjVector[v].size();i++){
-      //Se o vizinho não for visitado
-      if(visited[grafo.adjVector[v][i]]<0){
-        //Retira o elemento da lista de conexos
-        it = pointerVector[grafo.adjVector[v][i]-1];
-        cout<<"Esse é o elemento visitado: "<<*it<< ". De posição: "<<it<<endl;
-        conexos.remove(*it);
-        //Visita ele
-        visited[grafo.adjVector[v][i]] = constante;
-        //Adiciona ele ao vector de conectados
-        //conectados[constante].push_back(*it);
-        //Adiciona ele na fila
-        fila.push(grafo.adjVector[v][i]);
+    //Faz um iterator dos vizinhos da fila.front()
+    for (int i=0;i<(int)grafo.adjVector[vertex].size();i++){
+      //Vizinho é o *it
+      int vizinho = i;
+      //Se esse vizinho não tiver sido descoberto
+      if (!descoberto[grafo.adjVector[vertex][vizinho]]) {
+        //Vizinho pertence a mesma componente conexa do start
+        descoberto[grafo.adjVector[vertex][vizinho]] = constante;
+        //Adiciona o vizinho ao final do vector de componentes
+        componentesVector.push_back(grafo.adjVector[vertex][vizinho]);
+        //Adiciona o vizinho a fila
+        fila.push(grafo.adjVector[vertex][vizinho]);
       }
     }
   }
+  //Retorna o componentes Vector para adicionar a lista de componentes conexas
+  return componentesVector;
 }
 
-int componentesConexasVertice(grafoVector grafo){
-  //Cria um vector conectados
-  /*vector<int> *conectados;
-  conectados = new vector<int>[(int)grafo.numVertices+1];*/
-  //Cria uma lista de conexos
-  list<int>conexos;
-  //Cria um vector de ponteiros
-  vector<int*> pointerVector;
-  /*Preenche os conexos com os vértices do grafo e o
-   vetor de pointeiros com suas posições */
-  for(int i=1;i<=(int)grafo.numVertices;i++){
-    conexos.push_back(i);
-    pointerVector.push_back(&conexos.back());
-  }
-  //Inicia um iterator
-  auto start = conexos.end();
-  //Inicia uma constante (valor do label usado no array de visitados)
+int componentesConexasVector(grafoVector grafo){
+  //Cria um vector de tamanho numVertices+1 e seta todos como 0
+  vector <int> descoberto (grafo.numVertices+1, 0);
+  //Cria um vector de vector com as componente conexas do grafo
+  vector < vector <int> > verticesCC;
+  //Seta uma constante como 0
   int constante = 0;
-  //Cria um array de visitados e preenche com -1
-  int *visited;
-  visited = new int[grafo.numVertices+1];
-  for(int i=1;i<(int)grafo.numVertices+1;i++){
-    visited[i]=-1;
-  }
-  //Enquanto tiver vertices na lista de conexos
-  while(!conexos.empty()){
-    //Pega o ponteiro do ultimo elemento do vector de ponteiros
-    auto value = pointerVector.back();
-    //Pega a posição dele
-    std::advance(start, *value);
-    //Se não tiver sido visitado
-    if(visited[*start]==-1){
-      //Soma 1 a constante
+  //Para todos os vértices do grafo
+  for(int i = 1; i < grafo.numVertices+1; i++) {
+    //Se o vértice não foi descoberto
+    if (!descoberto[i]){
+      //Adiciona 1 a constante (será o label dessa componente conexa)
       constante++;
-      //Roda uma bfs com começo no start
-      bfsCCVertice(*start,grafo,constante, visited, pointerVector, conexos/*, conectados*/);
-      //cout<<"Esse é o tamanho do vetor de conexos: "<< conexos.size()<<endl;
+      //Roda uma bfs para essa componente conexa e adiciona ao VerticesCC
+      verticesCC.push_back( bfsCCVector(grafo, i , descoberto, constante));
     }
   }
-  /*
-  for(int i=grafo.numVertices; i>=1;i--){
-    cout<<visited[i]<<endl;
-  }
-
-  ofstream conectedComponents;
-  conectedComponents.open("conectedComponents.txt");
-  conectedComponents<<endl;
-  for(int i=1; i < (int)grafo.numVertices; i++){
-    if((int)conectados[i].size()>0){
-      conectedComponents<<"Vertices com marcação "<<i<<": "<<endl;
-      for(int j=0;j < (int)conectados[i].size();j++){
-        conectedComponents<<conectados[i][j]<<" ";
-      }
-      conectedComponents<<endl;
+  ofstream saida;
+  saida.open("connectedComponents.txt");
+  saida << "Número de componentes conexas: "<<verticesCC.size()<<"\n"<<endl;
+  sort(verticesCC.begin(), verticesCC.end(), comparaCC);
+  for (int i = 0; i < (int)verticesCC.size(); i++) {
+    saida <<"Tamanho da "<<i+1<<"ª Componente conexa: "<< verticesCC[i].size()<<endl;
+    saida <<"Abaixo estão os vértices que a compõem:"<<endl;
+    for(int j=0; j< (int)verticesCC[i].size();j++){
+      saida <<verticesCC[i][j]<<" ";
     }
+    saida<<endl;
   }
-  conectedComponents<<"Números de componentes conexas: "<<constante;
-  */
   return constante;
 }
 
 //Utilização pelo usuário(main)
 int main(){
-  grafoVector vector = constroiVector("dblp.txt");
-  //grafoMatriz matriz = constroiMatriz("as_graph.txt");
+  //grafoVector vector = constroiVector("dblp.txt");
+  //grafoMatriz matriz = constroiMatriz("teste.txt");
   clock_t start = clock();
-  cout<<componentesConexasVertice(vector)<<endl;
-  //cout<<distanciaVector(1,4,vector)<<endl;
+  //cout<<componentesConexasVector(vector)<<endl;
+  //cout<<componentesConexasMatriz(matriz)<<endl;
   //bfsVector(1, vector);
   clock_t end = clock();
   cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
