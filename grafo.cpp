@@ -1,12 +1,12 @@
 #include <iostream>
-#include <ctime>
-#include <fstream>
-#include <stack>
-#include <queue>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <string.h>
+#include <ctime> //Biblioteca para medir o tempo de execução
+#include <fstream> //Biblioteca para escrita e leitura de arquivos txt
+#include <stack> //Biblioteca com implementação de pilha
+#include <queue> //Biblioteca com implementação de fila
+#include <string> //Biblioteca com implementação de string
+#include <vector> //Biblioteca com implementação de array dinâmico
+#include <algorithm> //Biblioteca com implementação do sort
+#include <string.h> //Biblioteca com implementação do memset
 
 using namespace std;
 
@@ -59,6 +59,7 @@ grafoVector constroiVector(string arquivo){
   sort(grau, grau+numVertices+1);
 
   //Ordena o vetor de Adjacência
+
   for(int i=0;i<numVertices+1;i++){
     sort(adjVector[i].begin(),adjVector[i].end());
   }
@@ -171,11 +172,10 @@ void bfsMatriz(int start, grafoMatriz grafo){
   //Cria um vetor de pais
   int *pai;
   pai = new int[grafo.numVertices+1];
-  //Define todos os níveis e pais como -1
+  //Define todos os níveis como -1 e pais como 0;
   for(int i=0;i<(int)grafo.numVertices+1;i++){
     nivel[i]=-1;
   }
-  //memset(nivel, -1, grafo.numVertices+1);
   memset(pai, 0, grafo.numVertices+1);
   //Cria uma fila
   queue<int> fila;
@@ -255,7 +255,6 @@ void dfsMatriz(int start, grafoMatriz grafo){
       }
     }
   }
-
   ofstream dfsFile;
   dfsFile.open("dfsFile.txt");
   for(int i=1;i<(int)grafo.numVertices+1;i++){
@@ -305,7 +304,6 @@ int diametroMatriz(grafoMatriz grafo){
     int *nivel;
     nivel = new int[grafo.numVertices+1];
     //Define todos os níveis -1
-
     for(int i=0;i<(int)grafo.numVertices+1;i++){
       nivel[i]=-1;
     }
@@ -424,7 +422,6 @@ void bfsVector(int start, grafoVector grafo){
   memset(pai, 0, grafo.numVertices+1);
   //Cria uma fila
   queue<int> fila;
-  //for(int start=1;start<=1000;start++){
     //Adiciona o start a fila
     fila.push(start);
     //Define o Nivel do start como 0
@@ -446,18 +443,14 @@ void bfsVector(int start, grafoVector grafo){
         }
       }
     }
-    //Define todos os níveis e pais como -1
-    //for(int i=0;i<(int)grafo.numVertices+1;i++){
-      //nivel[i]=-1;
-      //pai[i]=-1;
-    //}
-  //}
+  /*
   ofstream bfsFile;
   bfsFile.open("bfsFile.txt");
   for(int i=1;i<(int)grafo.numVertices+1;i++){
     bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
   }
   bfsFile.close();
+  */
 
 }
 
@@ -482,7 +475,6 @@ void dfsVector(int start, grafoVector grafo){
   //Cria uma pilha
   stack <int> pilha;
   //Adiciona start a pilha;
-  //for(int start=1;start<=1000;start++){
     pilha.push(start);
     //Define o Nivel do start como 0
     nivel[start]=0;
@@ -501,12 +493,6 @@ void dfsVector(int start, grafoVector grafo){
           }
       }
     }
-    //for(int i=0;i<(int)grafo.numVertices+1;i++){
-      //nivel[i]=-1;
-    //}
-    //memset(pai,0,grafo.numVertices+1);
-    //memset(visited,0,grafo.numVertices+1);
-  //}
   ofstream dfsFile;
   dfsFile.open("dfsFile.txt");
     for(int i=1;i<(int)grafo.numVertices+1;i++){
@@ -564,7 +550,8 @@ int diametroVector(grafoVector grafo){
     }
     //Cria uma fila
     queue <int> fila;
-    for(int start=1; start<(int)grafo.numVertices+1;start++){
+    int start;
+    for(start=1; start<(int)grafo.numVertices+1;start++){
       //Adiciona o start a fila
       fila.push(start);
       //Define o Nivel do start como 0
@@ -643,7 +630,7 @@ int componentesConexasVector(grafoVector grafo){
       //Adiciona 1 a constante (será o label dessa componente conexa)
       constante++;
       //Roda uma bfs para essa componente conexa e adiciona ao VerticesCC
-      verticesCC.push_back( bfsCCVector(grafo, i , descoberto, constante));
+      verticesCC.push_back(bfsCCVector(grafo, i , descoberto, constante));
     }
   }
   ofstream saida;
@@ -663,12 +650,11 @@ int componentesConexasVector(grafoVector grafo){
 
 //Utilização pelo usuário(main)
 int main(){
-  //grafoVector vector = constroiVector("dblp.txt");
-  //grafoMatriz matriz = constroiMatriz("teste.txt");
+  //grafoMatriz matriz = constroiMatriz("as_graph.txt");
+  grafoVector vector = constroiVector("dblp.txt");
   clock_t start = clock();
   //cout<<componentesConexasVector(vector)<<endl;
-  //cout<<componentesConexasMatriz(matriz)<<endl;
-  //bfsVector(1, vector);
+  cout<<componentesConexasVector(vector)<<endl;
   clock_t end = clock();
   cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
 }
