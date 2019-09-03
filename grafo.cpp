@@ -52,7 +52,6 @@ grafoVector constroiVector(string arquivo){
     grau[vertex1]++;
     grau[vertex2]++;
     //Calcula o número de arestas
-    numArestas++;
   }
 
   //Ordena o vetor grau em O(nlog(n))
@@ -69,6 +68,7 @@ grafoVector constroiVector(string arquivo){
     soma+= grau[i];
   }
 
+  numArestas=soma/2;
   ofstream graphFile;
   graphFile.open("graphFile.txt");
   graphFile<< "Esse é o número de vértices: "<<numVertices<<endl;
@@ -119,14 +119,16 @@ grafoMatriz constroiMatriz(string arquivo){
   grau = new int[numVertices+1]();
   //Preenche a Matriz de Adjacência
   while(graphTexto>>vertex1>>vertex2){
-    //Insere o par (vértice1, vértice2) na matriz
-    adjMatriz[vertex1][vertex2]=true;
-    adjMatriz[vertex2][vertex1]=true;
-    //Calcula o grau de cada vértice
-    grau[vertex1]++;
-    grau[vertex2]++;
-    //Calcula o número de arestas
-    numArestas++;
+    if (!adjMatriz[vertex1][vertex2]){  
+      //Insere o par (vértice1, vértice2) na matriz
+      adjMatriz[vertex1][vertex2]=true;
+      adjMatriz[vertex2][vertex1]=true;
+      //Calcula o grau de cada vértice
+      grau[vertex1]++;
+      grau[vertex2]++;
+      //Calcula o número de arestas
+      numArestas++;
+    }
   }
 
   //Ordena em O(n.log(n)) o vetor de graus.
