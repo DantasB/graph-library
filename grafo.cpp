@@ -51,7 +51,6 @@ grafoVector constroiVector(string arquivo){
     //Calcula o grau de cada vértice
     grau[vertex1]++;
     grau[vertex2]++;
-    //Calcula o número de arestas
   }
 
   //Ordena o vetor grau em O(nlog(n))
@@ -67,8 +66,10 @@ grafoVector constroiVector(string arquivo){
   for(int i=1; i<(int)numVertices+1;i++){
     soma+= grau[i];
   }
-
+  
+  //Calcula o número de arestas
   numArestas=soma/2;
+  
   ofstream graphFile;
   graphFile.open("graphFile.txt");
   graphFile<< "Esse é o número de vértices: "<<numVertices<<endl;
@@ -119,16 +120,12 @@ grafoMatriz constroiMatriz(string arquivo){
   grau = new int[numVertices+1]();
   //Preenche a Matriz de Adjacência
   while(graphTexto>>vertex1>>vertex2){
-    if (!adjMatriz[vertex1][vertex2]){  
-      //Insere o par (vértice1, vértice2) na matriz
-      adjMatriz[vertex1][vertex2]=true;
-      adjMatriz[vertex2][vertex1]=true;
-      //Calcula o grau de cada vértice
-      grau[vertex1]++;
-      grau[vertex2]++;
-      //Calcula o número de arestas
-      numArestas++;
-    }
+    //Insere o par (vértice1, vértice2) na matriz
+    adjMatriz[vertex1][vertex2]=true;
+    adjMatriz[vertex2][vertex1]=true;
+    //Calcula o grau de cada vértice
+    grau[vertex1]++;
+    grau[vertex2]++;
   }
 
   //Ordena em O(n.log(n)) o vetor de graus.
@@ -138,7 +135,10 @@ grafoMatriz constroiMatriz(string arquivo){
   for(int i=1; i<(int)numVertices+1;i++){
     soma+= grau[i];
   }
-
+  
+  //Calcula o número de arestas
+  numArestas = soma/2;
+  
   ofstream graphFile;
   graphFile.open("graphFile.txt");
   graphFile<< "Esse é o número de vértices: "<<numVertices<<endl;
@@ -445,14 +445,13 @@ void bfsVector(int start, grafoVector grafo){
         }
       }
     }
-  /*
+  
   ofstream bfsFile;
   bfsFile.open("bfsFile.txt");
   for(int i=1;i<(int)grafo.numVertices+1;i++){
     bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
   }
   bfsFile.close();
-  */
 
 }
 
@@ -487,7 +486,7 @@ void dfsVector(int start, grafoVector grafo){
       if (visited[u] == 0){
           visited[u] = 1;
           for (int i=0;i<(int)grafo.adjVector[u].size();i++){
-              if(pai[grafo.adjVector[u][i]]==0){
+              if(nivel[grafo.adjVector[u][i]]==-1){
                 nivel[grafo.adjVector[u][i]] = nivel[u]+1;
                 pai[grafo.adjVector[u][i]] = u;
               }
