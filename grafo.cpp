@@ -22,7 +22,7 @@ struct grafoMatriz{
 };
 
 //Funções extras
-bool comparaCC(vector<int> &primeiro, vector<int> &segundo){
+bool comparaCC(vector<int> primeiro, vector<int> segundo){
    return primeiro.size() > segundo.size();
 }
 
