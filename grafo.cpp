@@ -211,6 +211,8 @@ void bfsMatriz(int start, grafoMatriz grafo){
 }
 
 void dfsMatriz(int start, grafoMatriz grafo){
+  //Cria um vetor para inverter os itens a adicionar na pilha
+  vector<int>addPilha;
   //Cria um vetor de niveis
   int *nivel;
   nivel = new int[grafo.numVertices+1];
@@ -231,7 +233,7 @@ void dfsMatriz(int start, grafoMatriz grafo){
   stack <int> pilha;
   //Adiciona start a pilha;
   pilha.push(start);
-  //Define o Nivel do start como 0
+  //Define o Nivel do start como 0 e pai do start como -1
   nivel[start]=0;
   pai[start]=-1;
   //Enquanto a pilha não estiver vazia
@@ -245,16 +247,22 @@ void dfsMatriz(int start, grafoMatriz grafo){
       visited[u] = true;
       //Para todas as vizinhanças do topo da pilha
       for(int v=1; v<(int)grafo.numVertices+1; v++){
-        if(grafo.adjMatriz[u][v]!=0){
+        if(grafo.adjMatriz[u][v]){
           //Se o vértice ainda não tem um pai
-          if (pai[v]==0){
+          if (!visited[v]){
             pai[v] = u;
             nivel[v] = nivel[u]+1;
           }
-          //Adiciona a vizinhança a pilha
-          pilha.push(v);
+          //Adiciona a vizinhança ao vector addPilha
+          addPilha.push_back(v);
         }
       }
+      //Inverte os itens a serem adicionados a pilha
+      for (vector<int>::const_iterator i = (addPilha.end() -1); i >= addPilha.begin(); --i){
+        pilha.push(*i);
+      }
+      //Zera o vector addPilha
+      addPilha.clear();
     }
   }
   ofstream dfsFile;
@@ -456,6 +464,8 @@ void bfsVector(int start, grafoVector grafo){
 }
 
 void dfsVector(int start, grafoVector grafo){
+  //Cria o vector addPilha
+  vector<int>addPilha;
   //Cria um vetor de niveis
   int *nivel;
   nivel = new int[grafo.numVertices+1];
@@ -486,13 +496,20 @@ void dfsVector(int start, grafoVector grafo){
       if (visited[u] == 0){
           visited[u] = 1;
           for (int i=0;i<(int)grafo.adjVector[u].size();i++){
-              if(nivel[grafo.adjVector[u][i]]==-1){
+              if(!visited[grafo.adjVector[u][i]]){
                 nivel[grafo.adjVector[u][i]] = nivel[u]+1;
                 pai[grafo.adjVector[u][i]] = u;
               }
-              pilha.push(grafo.adjVector[u][i]);
+              //Adiciona o vetor adjacente ao addPilha
+              addPilha.push_back(grafo.adjVector[u][i]);
           }
       }
+      //Inverte o vetor addPilha e adiciona os itens a pilha.
+      for (vector<int>::const_iterator i = (addPilha.end() -1); i >= addPilha.begin(); --i){
+        pilha.push(*i);
+      }
+      //Limpa o vetor addPilha
+      addPilha.clear();
     }
   ofstream dfsFile;
   dfsFile.open("dfsFile.txt");
