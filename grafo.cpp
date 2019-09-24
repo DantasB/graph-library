@@ -7,6 +7,10 @@
 #include <vector> //Biblioteca com implementação de array dinâmico
 #include <algorithm> //Biblioteca com implementação do sort
 #include <string.h> //Biblioteca com implementação do memset
+#include <utility>  //Biblioteca com implementação do pair
+#include <set> //Biblioteca com implementação do set
+
+#define INF 0x3f3f3f3f //define um valor infinito
 
 using namespace std;
 
