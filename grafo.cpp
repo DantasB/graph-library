@@ -21,6 +21,16 @@ struct grafoMatriz{
   bool **adjMatriz;
 };
 
+struct grafoMatrizComPeso{
+  int numVertices;
+  float **adjMatriz;
+};
+
+struct grafoVectorComPeso{
+  int numVertices;
+  vector< pair<int, int> >* adjVector;
+};
+
 //Funções extras
 bool comparaCC(vector<int> primeiro, vector<int> segundo){
    return primeiro.size() > segundo.size();
@@ -163,6 +173,176 @@ grafoMatriz constroiMatriz(string arquivo){
 
   grafo.adjMatriz = adjMatriz;
 
+  return grafo;
+}
+
+grafoMatrizComPeso constroiMatrizComPeso(string arquivo){
+  grafoMatrizComPeso grafo;
+  int numVertices;
+  float **adjMatriz;
+  int *grau;
+  int numArestas=0;
+  int vertex1, vertex2;
+  float peso;
+  ifstream graphTexto(arquivo.c_str());
+  //Esse é o próprio número de vértices
+  graphTexto >> numVertices;
+  grafo.numVertices = numVertices;
+  //Cria a Matriz de Adjacência
+  adjMatriz = new float*[numVertices+1];
+  for (int i = 0; i < numVertices+1; i++){
+        adjMatriz[i] = new float[numVertices+1];
+  }
+
+  //Zera a Matriz de Adjacência
+  for(int i=0;i< numVertices+1; i++){
+    memset(adjMatriz[i],false, numVertices+1);
+  }
+
+  //Cria um vetor de graus
+  grau = new int[numVertices+1]();
+  //Preenche a Matriz de Adjacência
+  while(graphTexto>>vertex1>>vertex2>>peso){
+    //Insere o par (vértice1, vértice2) na matriz
+    adjMatriz[vertex1][vertex2]=peso;
+    adjMatriz[vertex2][vertex1]=peso;
+    //Calcula o grau de cada vértice
+    grau[vertex1]++;
+    grau[vertex2]++;
+  }
+
+  //Ordena em O(n.log(n)) o vetor de graus.
+  sort(grau, grau+numVertices+1);
+
+  int soma=0;
+  for(int i=1; i<(int)numVertices+1;i++){
+    soma+= grau[i];
+  }
+
+  //Calcula o número de arestas
+  numArestas = soma/2;
+
+  ofstream graphFile;
+  graphFile.open("graphFile.txt");
+  graphFile<< "Esse é o número de vértices: "<<numVertices<<endl;
+  graphFile<< "Esse é o número de arestas: "<<numArestas<<endl;
+  //Após ordenado, o grau máximo é o ultimo elemento da lista
+  graphFile<< "Esse é o grau máximo: "<<grau[numVertices]<<endl;
+  //O grau mínimo será o primeiro elemento +1 (o primeiro será sempre 0)
+  graphFile<< "Esse é o grau mínimo: "<<grau[1]<<endl;
+  //O grau médio será o somatorio de cada grau dividido pelo numero de graus
+  graphFile<< "Esse é o grau médio: "<<soma/(numVertices-1)<<endl;
+  int mediana =0;
+  if (numVertices%2==0){
+
+    mediana = (grau[((int)numVertices/2)]+ grau[((int)numVertices/2)+1])/2;
+  }
+  else{
+    mediana = grau[((int)numVertices/2)+1];
+  }
+  graphFile<<"Essa é a mediana do grau: "<<mediana<<endl;
+
+  graphFile.close();
+
+  grafo.adjMatriz = adjMatriz;
+
+  //Imprime o grafo construido.
+  /*
+  for (int u = 0; u <= numVertices; u++) {
+    cout << "Nó " << u << " faz adjacência com \n";
+    for (int j=0; j<= numVertices;j++)
+    {
+      if (adjMatriz[u][j]>0){
+        cout << "\tNó " << j << " Cujo peso da aresta ="
+             << adjMatriz[u][j] << "\n";
+      }
+    }
+    cout << "\n";
+  }
+  */
+  return grafo;
+}
+
+grafoVectorComPeso constroiVectorComPeso(string arquivo){
+  grafoVectorComPeso grafo;
+  int numVertices;
+  int *grau;
+  vector < pair<int, int> > *adjVector;
+  int numArestas=0;
+  int vertex1, vertex2;
+  float peso;
+  ifstream graphTexto(arquivo.c_str());
+  //Esse é o próprio número de vértices
+  graphTexto >> numVertices;
+  grafo.numVertices = numVertices;
+  //Cria o vetor de adjacência
+  adjVector = new vector< pair<int,int> >[numVertices+1];
+
+  //Inicializa o vetor grau
+  grau = new int[numVertices+1]();
+
+  //Preenche o vetor de adjacência
+  while(graphTexto>>vertex1>>vertex2>>peso){
+    adjVector[vertex1].push_back(make_pair(vertex2, peso));
+    adjVector[vertex2].push_back(make_pair(vertex1, peso));
+    //Calcula o grau de cada vértice
+    grau[vertex1]++;
+    grau[vertex2]++;
+  }
+
+  //Ordena o vetor grau em O(nlog(n))
+  sort(grau, grau+numVertices+1);
+
+  //Ordena o vetor de Adjacência
+
+  for(int i=0;i<numVertices+1;i++){
+    sort(adjVector[i].begin(),adjVector[i].end());
+  }
+
+  int soma=0;
+  for(int i=1; i<(int)numVertices+1;i++){
+    soma+= grau[i];
+  }
+
+  //Calcula o número de arestas
+  numArestas=soma/2;
+
+  ofstream graphFile;
+  graphFile.open("graphFile.txt");
+  graphFile<< "Esse é o número de vértices: "<<numVertices<<endl;
+  graphFile<< "Esse é o número de arestas: "<<numArestas<<endl;
+  //Após ordenado, o grau máximo é o ultimo elemento da lista
+  graphFile<< "Esse é o grau máximo: "<<grau[numVertices]<<endl;
+  //O grau mínimo será o primeiro elemento +1 (o primeiro será sempre 0)
+  graphFile<< "Esse é o grau mínimo: "<<grau[1]<<endl;
+  //O grau médio será o somatorio de cada grau dividido pelo numero de graus
+  graphFile<< "Esse é o grau médio: "<<soma/(numVertices-1)<<endl;
+  int mediana =0;
+  if (numVertices%2==0){
+
+    mediana = (grau[((int)numVertices/2)]+ grau[((int)numVertices/2)+1])/2;
+  }
+  else{
+    mediana = grau[((int)numVertices/2)+1];
+  }
+  graphFile<<"Essa é a mediana do grau: "<<mediana<<endl;
+  graphFile.close();
+  grafo.adjVector = adjVector;
+  //Imprime o grafo construido.
+  /*
+  float v, w;
+  for (int u = 1; u <= numVertices; u++) {
+    cout << "Nó " << u << " faz adjacência com \n";
+    for (auto it = adjVector[u].begin(); it!=adjVector[u].end(); it++)
+    {
+        v = it->first;
+        w = it->second;
+        cout << "\tNó " << v << " Cujo peso da aresta ="
+             << w << "\n";
+    }
+    cout << "\n";
+  }
+  */
   return grafo;
 }
 
