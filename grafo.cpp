@@ -32,7 +32,7 @@ struct grafoMatrizComPeso{
 
 struct grafoVectorComPeso{
   int numVertices;
-  vector< pair<int, int> >* adjVector;
+  vector< pair<int, float> >* adjVector;
 };
 
 //Funções extras
@@ -200,7 +200,7 @@ grafoMatrizComPeso constroiMatrizComPeso(string arquivo){
 
   //Zera a Matriz de Adjacência
   for(int i=0;i< numVertices+1; i++){
-    memset(adjMatriz[i],false, numVertices+1);
+    memset(adjMatriz[i],0, numVertices+1);
   }
 
   //Cria um vetor de graus
@@ -271,7 +271,7 @@ grafoVectorComPeso constroiVectorComPeso(string arquivo){
   grafoVectorComPeso grafo;
   int numVertices;
   int *grau;
-  vector < pair<int, int> > *adjVector;
+  vector < pair<int, float> > *adjVector;
   int numArestas=0;
   int vertex1, vertex2;
   float peso;
@@ -280,7 +280,7 @@ grafoVectorComPeso constroiVectorComPeso(string arquivo){
   graphTexto >> numVertices;
   grafo.numVertices = numVertices;
   //Cria o vetor de adjacência
-  adjVector = new vector< pair<int,int> >[numVertices+1];
+  adjVector = new vector< pair<int, float> >[numVertices+1];
 
   //Inicializa o vetor grau
   grau = new int[numVertices+1]();
@@ -853,7 +853,7 @@ int componentesConexasVector(grafoVector grafo){
 //Funções para Matriz de Adjacência com peso
 float primMatriz(grafoMatrizComPeso grafo, int origem){
   //Cria um vector de custo de tamanho número de vértices
-  vector <double> custo(grafo.numVertices+1, INF);
+  vector <float> custo(grafo.numVertices+1, INF);
   //Define o custo da origem = 0
   custo[origem] = 0;
   // Cria vector com os pais = -1
@@ -861,13 +861,13 @@ float primMatriz(grafoMatrizComPeso grafo, int origem){
   vector <int> nivel (grafo.numVertices+1, 0);
   vector < bool > visitado (grafo.numVertices+1, false);
   // Cria o conjunto de vértices a serem percorridos (vasp)
-  set< pair<double, int> > vasp;
-  vasp.insert(make_pair(0, origem));
+  set< pair<float, int> > vasp;
+  vasp.insert(make_pair(custo[origem], origem));
   pai[origem] = 0;
   //Enquanto o conjunto tiver termos a serem percorridos
   while(!vasp.empty()){
     // Escolhe os vértices de menor distância
-    double current_cost = vasp.begin()->first;
+    float current_cost = vasp.begin()->first;
     int current_vertex = vasp.begin()->second;
     visitado[current_vertex] = true;
     // Remove o vértice do set e marca, indicando que foi percorrido
@@ -938,7 +938,7 @@ void dijkstraMatriz(grafoMatrizComPeso grafo, int start){
 //Funções para Vetor de Adjacência com peso
 float primVector(grafoVectorComPeso grafo, int origem){
   //Cria um vector de custo de tamanho número de vértices
-  vector <double> custo(grafo.numVertices+1, INF);
+  vector <float> custo(grafo.numVertices+1, INF);
   //Define o custo da origem = 0
   custo[origem] = 0;
   // Cria vector com os pais = -1
@@ -946,19 +946,19 @@ float primVector(grafoVectorComPeso grafo, int origem){
   vector <int> nivel (grafo.numVertices+1, 0);
   vector < bool > visitado (grafo.numVertices+1, false);
   // Cria o conjunto de vértices a serem percorridos (vasp)
-  set< pair<double, int> > vasp;
-  vasp.insert(make_pair(0, origem));
+  set< pair<float, int> > vasp;
+  vasp.insert(make_pair(custo[origem], origem));
   pai[origem] = 0;
   //Enquanto o conjunto tiver termos a serem percorridos
   while(!vasp.empty()){
     // Escolhe os vértices de menor distância
-    double current_cost = vasp.begin()->first;
+    float current_cost = vasp.begin()->first;
     int current_vertex = vasp.begin()->second;
     visitado[current_vertex] = true;
     // Remove o vértice do set e marca, indicando que foi percorrido
     vasp.erase(make_pair(current_cost, current_vertex));
     // Itera sobre os vizinhos do vértice atual sendo percorrido
-    for (vector <pair <int,int> > ::iterator it = grafo.adjVector[current_vertex].begin(); it!=grafo.adjVector[current_vertex].end(); ++it){
+    for (vector <pair <int,float> > ::iterator it = grafo.adjVector[current_vertex].begin(); it!=grafo.adjVector[current_vertex].end(); ++it){
       int vizinho = it->first;
       int peso = it->second;
       // Caso tenha achado um caminho melhor, ajusta a distância e insere no set
