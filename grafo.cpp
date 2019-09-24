@@ -846,6 +846,58 @@ int componentesConexasVector(grafoVector grafo){
   return constante;
 }
 
+//Funções para Matriz de Adjacência com peso
+
+float primMatriz(grafoMatrizComPeso grafo, int origem){
+  //Cria um vector de custo de tamanho número de vértices
+  vector <double> custo(grafo.numVertices+1, INF);
+  //Define o custo da origem = 0
+  custo[origem] = 0;
+  // Cria vector com os pais = -1
+  vector <int> pai (grafo.numVertices+1, -1);
+  vector <int> nivel (grafo.numVertices+1, 0);
+  vector < bool > visitado (grafo.numVertices+1, false);
+  // Cria o conjunto de vértices a serem percorridos (vasp)
+  set< pair<double, int> > vasp;
+  vasp.insert(make_pair(0, origem));
+  pai[origem] = 0;
+  //Enquanto o conjunto tiver termos a serem percorridos
+  while(!vasp.empty()){
+    // Escolhe os vértices de menor distância
+    double current_cost = vasp.begin()->first;
+    int current_vertex = vasp.begin()->second;
+    visitado[current_vertex] = true;
+    // Remove o vértice do set e marca, indicando que foi percorrido
+    vasp.erase(make_pair(current_cost, current_vertex));
+    // Itera sobre os vizinhos do vértice atual sendo percorrido
+    for (int i = 0; i < grafo.numVertices+1; i++){
+        // Caso tenha achado um caminho melhor, ajusta a distância e insere no set
+        if (grafo.adjMatriz[current_vertex][i]>0){
+          if (custo[i] > grafo.adjMatriz[current_vertex][i] && !visitado[i]){
+            custo[i] = grafo.adjMatriz[current_vertex][i];
+            vasp.insert(make_pair(custo[i], i));
+            pai[i] = current_vertex;
+            nivel[i] = nivel[current_vertex]+1;
+          }
+        }
+    }
+  }
+  float custo_total = 0;
+  for (int i = 1; i <= grafo.numVertices; i++){
+    custo_total += custo[i];
+  }
+  ofstream mstFile;
+  mstFile.open("mstfile.txt");
+  mstFile << "Custo total: "<<custo_total<<endl;
+  for(int i=1;i<grafo.numVertices+1;i++){
+    if (pai[i] != -1){
+    mstFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+    }
+  }
+  mstFile.close();
+  return custo_total;
+}
+
 //Utilização pelo usuário(main)
 int main(){
   //grafoMatriz matriz = constroiMatriz("as_graph.txt");
