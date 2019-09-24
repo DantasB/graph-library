@@ -27,7 +27,7 @@ This method construct the representation of [Adjacency Matrix](#adjacency-matrix
 ## Representations
 This library can represent graphs using Adjacency Vector and Adjacency Matrix.
 
-### Adjacency Vertex
+### Adjacency Vector
 This representation was built using the std vector and the simple array in c++. Also knowed as Array of vector.
 So, the user can add the max degree without problems about memory allocation.
 
