@@ -922,7 +922,7 @@ float primVector(grafoVectorComPeso grafo, int origem){
     // Remove o vértice do set e marca, indicando que foi percorrido
     vasp.erase(make_pair(current_cost, current_vertex));
     // Itera sobre os vizinhos do vértice atual sendo percorrido
-    for (auto it = grafo.adjVector[current_vertex].begin(); it!=grafo.adjVector[current_vertex].end(); ++it){
+    for (vector <pair <int,int> > ::iterator it = grafo.adjVector[current_vertex].begin(); it!=grafo.adjVector[current_vertex].end(); ++it){
       int vizinho = it->first;
       int peso = it->second;
       // Caso tenha achado um caminho melhor, ajusta a distância e insere no set
