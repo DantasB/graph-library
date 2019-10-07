@@ -1,9 +1,9 @@
-#include <iostream>
+#include <iostream> //Biblioteca para o uso do cout
+#include <stdio.h> //Biblioteca para usar o get char
 #include <ctime> //Biblioteca para medir o tempo de execução
 #include <fstream> //Biblioteca para escrita e leitura de arquivos txt
 #include <stack> //Biblioteca com implementação de pilha
 #include <queue> //Biblioteca com implementação de fila
-#include <string> //Biblioteca com implementação de string
 #include <vector> //Biblioteca com implementação de array dinâmico
 #include <algorithm> //Biblioteca com implementação do sort
 #include <string.h> //Biblioteca com implementação do memset
@@ -80,10 +80,10 @@ grafoVector constroiVector(string arquivo){
   for(int i=1; i<(int)numVertices+1;i++){
     soma+= grau[i];
   }
-  
+
   //Calcula o número de arestas
   numArestas=soma/2;
-  
+
   ofstream graphFile;
   graphFile.open("graphFile.txt");
   graphFile<< "Esse é o número de vértices: "<<numVertices<<endl;
@@ -149,10 +149,10 @@ grafoMatriz constroiMatriz(string arquivo){
   for(int i=1; i<(int)numVertices+1;i++){
     soma+= grau[i];
   }
-  
+
   //Calcula o número de arestas
   numArestas = soma/2;
-  
+
   ofstream graphFile;
   graphFile.open("graphFile.txt");
   graphFile<< "Esse é o número de vértices: "<<numVertices<<endl;
@@ -351,7 +351,7 @@ grafoVectorComPeso constroiVectorComPeso(string arquivo){
 }
 
 //Funções para Matriz de Adjacência
-void bfsMatriz(int start, grafoMatriz grafo){
+void bfsMatriz(int start, grafoMatriz grafo, bool salve=false){
   //Cria um vetor de niveis
   int *nivel;
   nivel = new int[grafo.numVertices+1];
@@ -386,15 +386,17 @@ void bfsMatriz(int start, grafoMatriz grafo){
       }
     }
   }
-  ofstream bfsFile;
-  bfsFile.open("bfsFile.txt");
-  for(int i=1;i<(int)grafo.numVertices+1;i++){
-    bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+  if(salve){
+    ofstream bfsFile;
+    bfsFile.open("bfsFile.txt");
+    for(int i=1;i<(int)grafo.numVertices+1;i++){
+      bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+    }
+    bfsFile.close();
   }
-  bfsFile.close();
 }
 
-void dfsMatriz(int start, grafoMatriz grafo){
+void dfsMatriz(int start, grafoMatriz grafo, bool salve=false){
   //Cria um vetor para inverter os itens a adicionar na pilha
   vector<int>addPilha;
   //Cria um vetor de niveis
@@ -449,12 +451,14 @@ void dfsMatriz(int start, grafoMatriz grafo){
       addPilha.clear();
     }
   }
-  ofstream dfsFile;
-  dfsFile.open("dfsFile.txt");
-  for(int i=1;i<(int)grafo.numVertices+1;i++){
-    dfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+  if(salve){
+    ofstream dfsFile;
+    dfsFile.open("dfsFile.txt");
+    for(int i=1;i<(int)grafo.numVertices+1;i++){
+      dfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+    }
+    dfsFile.close();
   }
-  dfsFile.close();
 }
 
 int distanciaMatriz(int v1, int v2, grafoMatriz grafo){
@@ -568,7 +572,7 @@ vector<int> bfsCCMatriz(grafoMatriz grafo, int start, vector<int>&descoberto, in
   return componentesMatriz;
 }
 
-int componentesConexasMatriz(grafoMatriz grafo){
+int componentesConexasMatriz(grafoMatriz grafo, bool salve=false){
   //Cria um vector de tamanho numVertices+1 e seta todos como 0
   vector <int> descoberto (grafo.numVertices+1, 0);
   //Cria um vector de vector com as componente conexas do grafo
@@ -585,23 +589,25 @@ int componentesConexasMatriz(grafoMatriz grafo){
       verticesCC.push_back( bfsCCMatriz(grafo, i , descoberto, constante));
     }
   }
-  ofstream saida;
-  saida.open("connectedComponents.txt");
-  saida << "Número de componentes conexas: "<<verticesCC.size()<<"\n"<<endl;
-  sort(verticesCC.begin(), verticesCC.end(), comparaCC);
-  for (int i = 0; i < (int)verticesCC.size(); i++) {
-    saida <<"Tamanho da "<<i+1<<"ª Componente conexa: "<< verticesCC[i].size()<<endl;
-    saida <<"Abaixo estão os vértices que a compõem:"<<endl;
-    for(int j=0; j< (int)verticesCC[i].size();j++){
-      saida <<verticesCC[i][j]<<" ";
+  if(salve){
+    ofstream saida;
+    saida.open("connectedComponents.txt");
+    saida << "Número de componentes conexas: "<<verticesCC.size()<<"\n"<<endl;
+    sort(verticesCC.begin(), verticesCC.end(), comparaCC);
+    for (int i = 0; i < (int)verticesCC.size(); i++) {
+      saida <<"Tamanho da "<<i+1<<"ª Componente conexa: "<< verticesCC[i].size()<<endl;
+      saida <<"Abaixo estão os vértices que a compõem:"<<endl;
+      for(int j=0; j< (int)verticesCC[i].size();j++){
+        saida <<verticesCC[i][j]<<" ";
+      }
+      saida<<endl;
     }
-    saida<<endl;
   }
   return constante;
 }
 
 //Funções para Vetor de Adjacência
-void bfsVector(int start, grafoVector grafo){
+void bfsVector(int start, grafoVector grafo, bool salve=false){
   //Cria um vetor de niveis
   int *nivel;
   nivel = new int[grafo.numVertices+1];
@@ -637,17 +643,17 @@ void bfsVector(int start, grafoVector grafo){
         }
       }
     }
-  
-  ofstream bfsFile;
-  bfsFile.open("bfsFile.txt");
-  for(int i=1;i<(int)grafo.numVertices+1;i++){
-    bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+  if(salve){
+    ofstream bfsFile;
+    bfsFile.open("bfsFile.txt");
+    for(int i=1;i<(int)grafo.numVertices+1;i++){
+      bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+    }
+    bfsFile.close();
   }
-  bfsFile.close();
-
 }
 
-void dfsVector(int start, grafoVector grafo){
+void dfsVector(int start, grafoVector grafo, bool salve=false){
   //Cria o vector addPilha
   vector<int>addPilha;
   //Cria um vetor de niveis
@@ -695,12 +701,14 @@ void dfsVector(int start, grafoVector grafo){
       //Limpa o vetor addPilha
       addPilha.clear();
     }
-  ofstream dfsFile;
-  dfsFile.open("dfsFile.txt");
-    for(int i=1;i<(int)grafo.numVertices+1;i++){
-        dfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+  if(salve){
+    ofstream dfsFile;
+    dfsFile.open("dfsFile.txt");
+      for(int i=1;i<(int)grafo.numVertices+1;i++){
+          dfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+    }
+    dfsFile.close();
   }
-  dfsFile.close();
 }
 
 int distanciaVector(int v1, int v2, grafoVector grafo){
@@ -733,9 +741,6 @@ int distanciaVector(int v1, int v2, grafoVector grafo){
         fila.push(grafo.adjVector[v][i]);
       }
     }
-  }
-  for(int i=0;i<grafo.numVertices+1;i++){
-    cout<<path[i]<<endl;
   }
   return path[v2];
 }
@@ -818,7 +823,7 @@ vector<int> bfsCCVector(grafoVector grafo, int start, vector<int>&descoberto, in
   return componentesVector;
 }
 
-int componentesConexasVector(grafoVector grafo){
+int componentesConexasVector(grafoVector grafo, bool salve=false){
   //Cria um vector de tamanho numVertices+1 e seta todos como 0
   vector <int> descoberto (grafo.numVertices+1, 0);
   //Cria um vector de vector com as componente conexas do grafo
@@ -835,23 +840,25 @@ int componentesConexasVector(grafoVector grafo){
       verticesCC.push_back(bfsCCVector(grafo, i , descoberto, constante));
     }
   }
-  ofstream saida;
-  saida.open("connectedComponents.txt");
-  saida << "Número de componentes conexas: "<<verticesCC.size()<<"\n"<<endl;
-  sort(verticesCC.begin(), verticesCC.end(), comparaCC);
-  for (int i = 0; i < (int)verticesCC.size(); i++) {
-    saida <<"Tamanho da "<<i+1<<"ª Componente conexa: "<< verticesCC[i].size()<<endl;
-    saida <<"Abaixo estão os vértices que a compõem:"<<endl;
-    for(int j=0; j< (int)verticesCC[i].size();j++){
-      saida <<verticesCC[i][j]<<" ";
+  if(salve){
+    ofstream saida;
+    saida.open("connectedComponents.txt");
+    saida << "Número de componentes conexas: "<<verticesCC.size()<<"\n"<<endl;
+    sort(verticesCC.begin(), verticesCC.end(), comparaCC);
+    for (int i = 0; i < (int)verticesCC.size(); i++) {
+      saida <<"Tamanho da "<<i+1<<"ª Componente conexa: "<< verticesCC[i].size()<<endl;
+      saida <<"Abaixo estão os vértices que a compõem:"<<endl;
+      for(int j=0; j< (int)verticesCC[i].size();j++){
+        saida <<verticesCC[i][j]<<" ";
+      }
+      saida<<endl;
     }
-    saida<<endl;
   }
   return constante;
 }
 
 //Funções para Matriz de Adjacência com peso
-float primMatriz(grafoMatrizComPeso grafo, int origem){
+float primMatriz(grafoMatrizComPeso grafo, int origem, bool salve=false){
   //Cria um vector de custo de tamanho número de vértices
   vector <float> custo(grafo.numVertices+1, INF);
   //Define o custo da origem = 0
@@ -889,23 +896,31 @@ float primMatriz(grafoMatrizComPeso grafo, int origem){
   for (int i = 1; i <= grafo.numVertices; i++){
     custo_total += custo[i];
   }
-  ofstream mstFile;
-  mstFile.open("mstfile.txt");
-  mstFile << "Custo total: "<<custo_total<<endl;
-  for(int i=1;i<grafo.numVertices+1;i++){
-    if (pai[i] != -1){
-    mstFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+  if(salve){
+    ofstream mstFile;
+    mstFile.open("mstfile.txt");
+    mstFile << "Custo total: "<<custo_total<<endl;
+    for(int i=1;i<grafo.numVertices+1;i++){
+      if (pai[i] != -1){
+      mstFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+      }
     }
+    mstFile.close();
   }
-  mstFile.close();
   return custo_total;
 }
 
-void dijkstraMatriz(grafoMatrizComPeso grafo, int start){
+void dijkstraMatriz(grafoMatrizComPeso grafo, int start, int objective=-1){
   //Cria um vector de custo de tamanho número de vértices
   vector <float> distancia(grafo.numVertices+1, INF);
+
+  int *pai;
+  pai = new int[grafo.numVertices+1];
+  memset(pai,0,grafo.numVertices+1);
+
   //Define o custo da origem = 0
   distancia[start] = 0;
+  pai[start] = -1;
   // Cria o conjunto de vértices a serem percorridos (vasp)
   set< pair<float, int> > vasp;
   vasp.insert(make_pair(distancia[start], start));
@@ -913,6 +928,10 @@ void dijkstraMatriz(grafoMatrizComPeso grafo, int start){
   while(!vasp.empty()){
     // Escolhe os vértices de menor distância
     float current_dist = vasp.begin()->first;
+    if(current_dist < 0){
+      cout<<"Para executar dijkstra todos os pesos devem ser maiores que 0"<<endl;
+      break;
+    }
     int current_vertex = vasp.begin()->second;
     // Remove o vértice do set e marca, indicando que foi percorrido
     vasp.erase(make_pair(current_dist, current_vertex));
@@ -921,18 +940,55 @@ void dijkstraMatriz(grafoMatrizComPeso grafo, int start){
         // Caso tenha achado um caminho melhor, ajusta a distância e insere no set
         if (grafo.adjMatriz[current_vertex][i]>0){
           if (distancia[i] > distancia[current_vertex] + grafo.adjMatriz[current_vertex][i]){
+            pai[i] = current_vertex;
             distancia[i] = distancia[current_vertex] + grafo.adjMatriz[current_vertex][i];
             vasp.insert(make_pair(distancia[i], i));
           }
         }
     }
   }
-  /*
-  printf("Vertex   Distance from Source\n");
-  for (int i = 1; i < grafo.numVertices+1; i++){
-    cout<<i<<" "<< distancia[i]<<endl;
+  int x=0;
+  float dist_valor = 0;
+  if(objective == -1){
+    for (int i = 1; i < grafo.numVertices+1; i++){
+      x = i;
+      if(x!=start){
+        cout<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
+        if (distancia[x] != INF){
+          cout<<"[";
+          while(x != start){
+            dist_valor += distancia[x];
+            cout<<x<<", ";
+            x = pai[x];
+          }
+          cout<<x<<"], "<<"Distância entre eles: "<<dist_valor<<endl;
+          dist_valor = 0;
+        }
+        else{
+          cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+        }
+      }
+    }
   }
-  */
+  else{
+    x = objective;
+    if(x!=start){
+      cout<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
+      if (distancia[x] != INF){
+        cout<<"[";
+        while(x != start){
+          dist_valor += distancia[x];
+          cout<<x<<", ";
+          x = pai[x];
+        }
+        cout<<x<<"], "<<"Distância entre eles: "<<dist_valor<<endl;
+        dist_valor = 0;
+      }
+      else{
+        cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+      }
+    }
+  }
 }
 
 int eccentricityMatriz(grafoMatrizComPeso grafo, int start){
@@ -967,7 +1023,7 @@ int eccentricityMatriz(grafoMatrizComPeso grafo, int start){
   }
   int min = 0;
   for (int i = 1; i < grafo.numVertices+1; i++){
-    if(distancia[i]>min){
+    if(distancia[i]>min && distancia[i] != INF){
       min = distancia[i];
     }
   }
@@ -975,7 +1031,7 @@ int eccentricityMatriz(grafoMatrizComPeso grafo, int start){
 }
 
 //Funções para Vetor de Adjacência com peso
-float primVector(grafoVectorComPeso grafo, int origem){
+float primVector(grafoVectorComPeso grafo, int origem, bool salve=false){
   //Cria um vector de custo de tamanho número de vértices
   vector <float> custo(grafo.numVertices+1, INF);
   //Define o custo da origem = 0
@@ -1013,23 +1069,30 @@ float primVector(grafoVectorComPeso grafo, int origem){
   for (int i = 1; i <= grafo.numVertices; i++){
     custo_total += custo[i];
   }
-  ofstream mstFile;
-  mstFile.open("mstfile.txt");
-  mstFile << "Custo total: "<<custo_total<<endl;
-  for(int i=1;i<grafo.numVertices+1;i++){
-    if (pai[i] != -1){
-    mstFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+  if(salve){
+    ofstream mstFile;
+    mstFile.open("mstfile.txt");
+    mstFile << "Custo total: "<<custo_total<<endl;
+    for(int i=1;i<grafo.numVertices+1;i++){
+      if (pai[i] != -1){
+      mstFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+      }
     }
+    mstFile.close();
   }
-  mstFile.close();
   return custo_total;
 }
 
-void dijkstraVector(grafoVectorComPeso grafo, int start){
+void dijkstraVector(grafoVectorComPeso grafo, int start, int objective=-1){
   //Cria um vector de custo de tamanho número de vértices
   vector <float> distancia(grafo.numVertices+1, INF);
+
+  int *pai;
+  pai = new int[grafo.numVertices+1];
+
   //Define o custo da origem = 0
   distancia[start] = 0;
+  pai[start] = -1;
   // Cria o conjunto de vértices a serem percorridos (vasp)
   set< pair<float, int> > vasp;
   vasp.insert(make_pair(distancia[start], start));
@@ -1037,6 +1100,10 @@ void dijkstraVector(grafoVectorComPeso grafo, int start){
   while(!vasp.empty()){
     // Escolhe os vértices de menor distância
     float current_dist = vasp.begin()->first;
+    if(current_dist < 0){
+      cout<<"Para executar dijkstra todos os pesos devem ser maiores que 0"<<endl;
+      break;
+    }
     int current_vertex = vasp.begin()->second;
     // Remove o vértice do set e marca, indicando que foi percorrido
     vasp.erase(make_pair(current_dist, current_vertex));
@@ -1047,17 +1114,54 @@ void dijkstraVector(grafoVectorComPeso grafo, int start){
       // Caso tenha achado um caminho melhor, ajusta a distância e insere no set
       if (distancia[vizinho] > distancia[current_vertex] + peso){
         distancia[vizinho] = distancia[current_vertex] + peso;
+        pai[vizinho] = current_vertex;
         vasp.insert(make_pair(distancia[vizinho], vizinho));
 
       }
     }
   }
-  /*
-  printf("Vertex   Distance from Source\n");
-  for (int i = 1; i < grafo.numVertices+1; i++){
-    cout<<i<<" "<< distancia[i]<<endl;
+  int x=0;
+  float dist_valor = 0;
+  if(objective == -1){
+    for (int i = 1; i < grafo.numVertices+1; i++){
+      x = i;
+      if(x!=start){
+        cout<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
+        if (distancia[x] != INF){
+          cout<<"[";
+          while(x != start){
+            dist_valor += distancia[x];
+            cout<<x<<", ";
+            x = pai[x];
+          }
+          cout<<x<<"], "<<"Distância entre eles: "<<dist_valor<<endl;
+          dist_valor = 0;
+        }
+        else{
+          cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+        }
+      }
+    }
   }
-  */
+  else{
+    x = objective;
+    if(x!=start){
+      cout<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
+      if (distancia[x] != INF){
+        cout<<"[";
+        while(x != start){
+          dist_valor += distancia[x];
+          cout<<x<<", ";
+          x = pai[x];
+        }
+        cout<<x<<"], "<<"Distância entre eles: "<<dist_valor<<endl;
+        dist_valor = 0;
+      }
+      else{
+        cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+      }
+    }
+  }
 }
 
 float eccentricityVector(grafoVectorComPeso grafo, int start){
@@ -1093,7 +1197,7 @@ float eccentricityVector(grafoVectorComPeso grafo, int start){
   }
   float min = 0;
   for (int i = 1; i < grafo.numVertices+1; i++){
-    if(distancia[i]>min){
+    if(distancia[i]>min && distancia[i] != INF){
       min = distancia[i];
     }
   }
@@ -1102,11 +1206,13 @@ float eccentricityVector(grafoVectorComPeso grafo, int start){
 
 //Utilização pelo usuário(main)
 int main(){
-  //grafoMatriz matriz = constroiMatriz("as_graph.txt");
-  grafoVector vector = constroiVector("dblp.txt");
+  //grafoMatrizComPeso matriz = constroiMatrizComPeso("teste.txt");
+  grafoVectorComPeso vector = constroiVectorComPeso("grafo_1.txt");
   clock_t start = clock();
-  //cout<<componentesConexasVector(vector)<<endl;
-  cout<<componentesConexasVector(vector)<<endl;
+  //getchar();
+  //dijkstraMatriz(matriz, 1);
+  dijkstraVector(vector, 1, 200);
+  //dfsMatriz(1,matriz);
   clock_t end = clock();
-  cout<< (double)(end-start)/CLOCKS_PER_SEC<<endl;
+  cout<< (float)(end-start)/CLOCKS_PER_SEC<< " segundos."<<endl;
 }
