@@ -27,13 +27,13 @@ The library have two constructor methods that return us a type grafo. This type 
 This method construct the representation of [Adjacency Vector](#adjacency-vector) and write every information of the graph in a txt file named (graphfile). This method returns a grafoVector type, so, be careful on define the variables.
 
 ### Method constroiVectorComPeso
-Like the [constroiVector](#method-constroiVector),this method construct the representation of [Adjacency Vector](#adjacency-vector) and write every information of the graph in a txt file named (graphfile). The main difference is that the data structure is representes using Array of Vector and the Vector contains a pair (neighbor, weight).This method returns a grafoVectorComPeso type. 
+Like the [constroiVector](#method-constroiVector), this method construct the representation of [Adjacency Vector](#adjacency-vector) and write every information of the graph in a txt file named (graphfile). The main difference is that the data structure is representes using Array of Vector and the Vector contains a pair (neighbor, weight).This method returns a grafoVectorComPeso type. 
 
 ### Method constroiMatriz
 This method construct the representation of [Adjacency Matrix](#adjacency-matrix) and like the [Method constroiVector](#method-constroiVector) it writes a txt file named graphfile. This method returns a grafoMatriz type.
 
 ### Method constroiMatrizComPeso
-Like the [constroiVector](#method-constroiVector),this method construct the representation of [Adjacency Matrix](#adjacency-matrix) and write every information of the graph in a txt file named (graphfile). The main difference is that the data structure is representes using 2D array of integers, that the integer represent the weight between the vertex.This method returns a grafoMatrizComPeso type. 
+Like the [constroiVector](#method-constroiVector), this method construct the representation of [Adjacency Matrix](#adjacency-matrix) and write every information of the graph in a txt file named (graphfile). The main difference is that the data structure is representes using 2D array of integers, that the integer represent the weight between the vertex.This method returns a grafoMatrizComPeso type. 
 
 ## Representations
 This library can represent graphs using Adjacency Vector and Adjacency Matrix.
