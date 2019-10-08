@@ -1157,7 +1157,6 @@ double primVector(grafoVectorComPeso grafo, int origem, bool salve=false){
     mstFile.close();
   }
   //Retorna o custo total da mst
-  printf("%.15g\n", custo_total);
   return custo_total;
 }
 
