@@ -9,7 +9,7 @@
 #include <string.h> //Biblioteca com implementação do memset
 #include <utility>  //Biblioteca com implementação do pair
 #include <set> //Biblioteca com implementação do set
-#include <sstream> //Separa a string
+#include <sstream> //Split na string
 #define INF 0x3f3f3f3f //Define um valor infinito
 
 using namespace std;
@@ -44,16 +44,24 @@ grafoVectorComPeso constroiVectorComPeso(string arquivo, string refere){
   }
   grafo.adjVector = adjVector;
 
+  //Abre o arquivo refere
   ifstream nomes(refere.c_str());
   string str;
+  //Enquanto tiver linha para ler no arquivo refere
   while(getline(nomes,str)){
+    //Apaga as vírgulas da linha
     str.erase(remove(str.begin(), str.end(), ','), str.end());
+    //Troca os espaços da linha por _
     replace(str.begin(), str.end(), ' ', '_');
+    //stringstream separa a string str em substrings
     stringstream ss(str);
     int vertice;
     string nome;
+    //Enquanto tiver vértice e nome na string str
     while (ss >> vertice >> nome){
+      //Remove o _ e adiciona novamente espaço
       replace(nome.begin(), nome.end(), '_', ' ');
+      //Adiciona o nome ao vector referentes
       referentes[vertice] = nome;
     }
   }
@@ -62,13 +70,16 @@ grafoVectorComPeso constroiVectorComPeso(string arquivo, string refere){
 }
 
 void dijkstraVector(grafoVectorComPeso grafo, string start, string objective="-1"){
+  //Cria duas variáveis inicio e objetivo (armazenarão as posições do início e objetivo)
   int inicio = 0;
   int objetivo = -1;
+  //Percorre o grafo para descobrir a posição da string start
   for(int i=1;i<=grafo.numVertices;i++){
     if (grafo.referentes[i]==start){
       inicio = i;
     }
   }
+  //Percorre o grafo para descobrir a posição da string objective
   if(objective != "-1"){
     for(int i=1;i<=grafo.numVertices;i++){
       if (grafo.referentes[i]==objective){
@@ -190,6 +201,7 @@ void dijkstraVector(grafoVectorComPeso grafo, string start, string objective="-1
 
 double primVector(grafoVectorComPeso grafo, string inicial, bool salve=false){
   int origem = 1;
+  //Descobre a posição da string inicial
   for(int i=1;i<=grafo.numVertices;i++){
     if (grafo.referentes[i]==inicial){
       origem = i;
@@ -199,8 +211,9 @@ double primVector(grafoVectorComPeso grafo, string inicial, bool salve=false){
   vector <double> custo(grafo.numVertices+1, INF);
   //Define o custo da origem = 0
   custo[origem] = 0;
+  //Cria um ponteiro para um array grau
   int *grau;
-  //Inicializa o vetor grau
+  //Inicializa o vetor grau de tamanho numVertices+1
   grau = new int[grafo.numVertices+1]();
   //Cria vector inteiro com os pais = -1
   vector <int> pai (grafo.numVertices+1, -1);
@@ -252,6 +265,9 @@ double primVector(grafoVectorComPeso grafo, string inicial, bool salve=false){
       custo_total += custo[i];
     }
   }
+  //Cria um vetor de vector Para armazenar os vizinhos de um vértice
+  vector <int > *vizinhos;
+  vizinhos = new vector <int> [grafo.numVertices+1];
   //Se o usuário escolher salvar
   if(salve){
     //Cria um arquivo mstFile
@@ -268,44 +284,99 @@ double primVector(grafoVectorComPeso grafo, string inicial, bool salve=false){
     for(int i=1;i<grafo.numVertices+1;i++){
       if (pai[i] != -1){
         mstFile<< "Vértice: "<< grafo.referentes[i] <<", Nível: "<< nivel[i]<<", Pai: "<< grafo.referentes[pai[i]]<<endl;
-        //Calcula o grau de cada vértice
+        //Calcula o grau de cada vértice se o nível for diferente de 0.
         if(nivel[i]!=0){
           grau[i]++;
           grau[pai[i]]++;
+          //Adiciona o vetor e o vizinho ao conjunto de vizinhos
+          vizinhos[i].push_back(pai[i]);
+          vizinhos[pai[i]].push_back(i);
         }
       }
     }
     //Fecha o arquivo
     mstFile.close();
   }
+  //Cria 2 variaveis: maior (Guarda o maior grau), pessoa(Guarda o indice da pessoa de maior grau)
   int maior = 0;
   int pessoa = 0;
+  //Percorre o array de graus buscando o maior
   for(int i=1;i<=grafo.numVertices;i++){
     if(grau[i]>maior){
       maior = grau[i];
       pessoa = i;
     }
   }
+
+  //Separa os grafos de maiores graus na MST
   cout<<"Abaixo estão os graus máximos do grafo de colaboradores: "<<endl;
+
   cout<<"Colaborador: "<< grafo.referentes[pessoa]<<", Grau: "<<maior<<endl;
+
+  //Após a pessoa já tiver sido escolhida, retira ela da lista de graus.
+  //Reseta as variáveis
   grau[pessoa] = 0;
   maior = 0;
+  //Percorre o array de graus buscando o segundo maior
   for(int i=1;i<=grafo.numVertices;i++){
     if(grau[i]>maior){
       maior = grau[i];
       pessoa = i;
     }
   }
+
   cout<<"Colaborador: "<< grafo.referentes[pessoa]<<", Grau: "<<maior<<endl;
+  //Após a pessoa já tiver sido escolhida, retira ela da lista de graus.
+  //Reseta as variáveis
   grau[pessoa] = 0;
   maior = 0;
+
+  //Percorre o array de graus buscando o terceiro maior
   for(int i=1;i<=grafo.numVertices;i++){
     if(grau[i]>maior){
       maior = grau[i];
       pessoa = i;
     }
   }
+
   cout<<"Colaborador: "<< grafo.referentes[pessoa]<<", Grau: "<<maior<<endl;
+
+  //Imprime os vizinhos de Daniel R. Figueiredo e Edsger W. Dijkstra.
+  //Cria duas variáveis inteiras
+  int daniel;
+  int dijkstra;
+  //Percorre o grafo para descobrir a posição de Daniel
+  for(int i=1;i<=grafo.numVertices;i++){
+    if (grafo.referentes[i]=="Daniel R. Figueiredo"){
+      daniel = i;
+    }
+  }
+  //Percorre o grafo para descobrir a posição de Dijkstra
+  for(int i=1;i<=grafo.numVertices;i++){
+    if (grafo.referentes[i]=="Edsger W. Dijkstra"){
+      dijkstra = i;
+    }
+  }
+
+  //Imprime os vizinhos de Daniel
+  cout << "Nó: " << grafo.referentes[daniel] << ", Vizinhos: [";
+  //Percorre o vector de vizinhos e imprime os vizinhos de Daniel.
+  for(int i=0;i<(int)vizinhos[daniel].size()-1;i++){
+    cout << grafo.referentes[vizinhos[daniel][i]] << ", ";
+  }
+  cout<<grafo.referentes[vizinhos[daniel][(int)vizinhos[daniel].size()-1]];
+  cout << "]"<<"\n";
+
+  //Imprime os vizinhos de Dijkstra
+  cout << "Nó: " << grafo.referentes[dijkstra] << ", Vizinhos: [";
+
+  //Percorre o vector de vizinhos e imprime os vizinhos de Daniel.
+  for(int i=0;i<(int)vizinhos[dijkstra].size()-1;i++){
+    cout << grafo.referentes[vizinhos[dijkstra][i]] << ", ";
+  }
+  cout<<grafo.referentes[vizinhos[daniel][(int)vizinhos[dijkstra].size()-1]];
+  cout << "]"<<"\n";
+
   //Retorna o custo total da mst
   return custo_total;
 }
