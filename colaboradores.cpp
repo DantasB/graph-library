@@ -357,7 +357,6 @@ double primVector(grafoVectorComPeso grafo, string inicial, bool salve=false){
       dijkstra = i;
     }
   }
-
   //Imprime os vizinhos de Daniel
   cout << "Nó: " << grafo.referentes[daniel] << ", Vizinhos: [";
   //Percorre o vector de vizinhos e imprime os vizinhos de Daniel.
@@ -370,11 +369,11 @@ double primVector(grafoVectorComPeso grafo, string inicial, bool salve=false){
   //Imprime os vizinhos de Dijkstra
   cout << "Nó: " << grafo.referentes[dijkstra] << ", Vizinhos: [";
 
-  //Percorre o vector de vizinhos e imprime os vizinhos de Daniel.
+  //Percorre o vector de vizinhos e imprime os vizinhos de Dijkstra.
   for(int i=0;i<(int)vizinhos[dijkstra].size()-1;i++){
     cout << grafo.referentes[vizinhos[dijkstra][i]] << ", ";
   }
-  cout<<grafo.referentes[vizinhos[daniel][(int)vizinhos[dijkstra].size()-1]];
+  cout<<grafo.referentes[vizinhos[dijkstra][(int)vizinhos[dijkstra].size()-1]];
   cout << "]"<<"\n";
 
   //Retorna o custo total da mst
