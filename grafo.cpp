@@ -931,6 +931,8 @@ double primMatriz(grafoMatrizComPeso grafo, int origem, bool salve=false){
 }
 
 void dijkstraMatriz(grafoMatrizComPeso grafo, int start, int objective=-1){
+  //Cria uma variável controle
+  bool control = 0;
   //Cria um vector de distancia de tamanho número de vértices
   vector <double> distancia(grafo.numVertices+1, INF);
   //Cria um array de pai
@@ -953,6 +955,8 @@ void dijkstraMatriz(grafoMatrizComPeso grafo, int start, int objective=-1){
     //Se tiver peso negativo, para o código
     if(current_dist < 0){
       cout<<"Para executar dijkstra todos os pesos devem ser maiores que 0"<<endl;
+      //Seta controle = 1
+      control =1;
       break;
     }
     int current_vertex = vasp.begin()->second;
@@ -979,7 +983,7 @@ void dijkstraMatriz(grafoMatrizComPeso grafo, int start, int objective=-1){
   int x=0;
   //Cria um double dist_valor
   //Se o usuário definir um vetor objetivo
-  if(objective == -1){
+  if(objective == -1 && !control){
     //Para todos os vértices do grafo
     for (int i = 1; i < grafo.numVertices+1; i++){
       //x será seu novo vértice objetivo
@@ -1009,31 +1013,34 @@ void dijkstraMatriz(grafoMatrizComPeso grafo, int start, int objective=-1){
   }
   //Se tiver um objetivo
   else{
-    x = objective;
-    //Enquanto o objetivo não for o começo
-    if(x!=start){
-      //Imprime o caminho até o começo
-      cout<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
-      //Se tiver um caminho até x
-      if (distancia[x] != INF){
-        cout<<"[";
-        while(x != start){
-          cout<<x<<", ";
-          //x agora é quem descobriu x
-          x = pai[x];
+    //Se não tiver nenhum peso negativo
+    if(!control){
+      x = objective;
+      //Enquanto o objetivo não for o começo
+      if(x!=start){
+        //Imprime o caminho até o começo
+        cout<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
+        //Se tiver um caminho até x
+        if (distancia[x] != INF){
+          cout<<"[";
+          while(x != start){
+            cout<<x<<", ";
+            //x agora é quem descobriu x
+            x = pai[x];
+          }
+          cout<<x<<"], "<<"Distância entre eles: "<<distancia[objective]<<endl;
         }
-        cout<<x<<"], "<<"Distância entre eles: "<<distancia[objective]<<endl;
-      }
-      //Se não tiver um caminho de x até start
-      else{
-        //Imprime INFINITO
-        cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+        //Se não tiver um caminho de x até start
+        else{
+          //Imprime INFINITO
+          cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+        }
       }
     }
   }
 }
 
-int eccentricityMatriz(grafoMatrizComPeso grafo, int start){
+double eccentricityMatriz(grafoMatrizComPeso grafo, int start){
   //Cria um vector de distância de tamanho número de vértices +1
   vector <double> distancia(grafo.numVertices+1, INF);
   //Define a distância até start = 0
@@ -1068,7 +1075,7 @@ int eccentricityMatriz(grafoMatrizComPeso grafo, int start){
     }
   }
   //Define uma váriavel minimo
-  int min = 0;
+  double min = 0;
   //Percorre todos os vizinhos
   for (int i = 1; i < grafo.numVertices+1; i++){
     //Pega a distância máxima
@@ -1112,7 +1119,7 @@ double primVector(grafoVectorComPeso grafo, int origem, bool salve=false){
     //Itera sobre os vizinhos do vértice atual sendo percorrido
     for (vector <pair <int,double> > ::iterator it = grafo.adjVector[current_vertex].begin(); it!=grafo.adjVector[current_vertex].end(); ++it){
       int vizinho = it->first;
-      int peso = it->second;
+      double peso = it->second;
       //Caso tenha achado um caminho melhor, ajusta a distância e insere no conjunto
       //Se o custo de i > peso da aresta entre vértice atual e i
       //E, se ele não tiver sido visitado
@@ -1150,10 +1157,13 @@ double primVector(grafoVectorComPeso grafo, int origem, bool salve=false){
     mstFile.close();
   }
   //Retorna o custo total da mst
+  printf("%.15g\n", custo_total);
   return custo_total;
 }
 
 void dijkstraVector(grafoVectorComPeso grafo, int start, int objective=-1){
+  //Cria uma variável controle
+  bool control = 0;
   //Cria um vector de distancia de tamanho número de vértices
   vector <double> distancia(grafo.numVertices+1, INF);
   //Cria um array de pai
@@ -1176,6 +1186,8 @@ void dijkstraVector(grafoVectorComPeso grafo, int start, int objective=-1){
     //Se tiver peso negativo, para o código
     if(current_dist < 0){
       cout<<"Para executar dijkstra todos os pesos devem ser maiores que 0"<<endl;
+      //Controle = 1
+      control=1;
       break;
     }
     int current_vertex = vasp.begin()->second;
@@ -1184,11 +1196,13 @@ void dijkstraVector(grafoVectorComPeso grafo, int start, int objective=-1){
     //Itera sobre os vizinhos do vértice atual
     for (vector <pair <int,double> > ::iterator it = grafo.adjVector[current_vertex].begin(); it!=grafo.adjVector[current_vertex].end(); ++it){
       int vizinho = it->first;
-      int peso = it->second;
+      double peso = it->second;
       //Se a distância de i for maior que a distância de seu vizinho + peso da aresta entre eles
       if (distancia[vizinho] > distancia[current_vertex] + peso){
         //Altera distância[i]
         distancia[vizinho] = distancia[current_vertex] + peso;
+        if(vizinho == 10){
+        }
         //Altera pai[i]
         pai[vizinho] = current_vertex;
         //Caso tenha achado um caminho melhor, ajusta a distância e insere no conjunto
@@ -1200,7 +1214,7 @@ void dijkstraVector(grafoVectorComPeso grafo, int start, int objective=-1){
   //Cria um inteiro x
   int x=0;
   //Se o usuário definir um vetor objetivo
-  if(objective == -1){
+  if(objective == -1 && !control){
     //Para todos os vértices do grafo
     for (int i = 1; i < grafo.numVertices+1; i++){
       //x será seu novo vértice objetivo
@@ -1218,7 +1232,8 @@ void dijkstraVector(grafoVectorComPeso grafo, int start, int objective=-1){
             //x agora é quem descobriu x
             x = pai[x];
           }
-          cout<<x<<"], "<<"Distância entre eles: "<<distancia[i]<<endl;
+          cout<<x<<"], "<<"Distância entre eles: ";
+          printf("%.15g\n", distancia[i]);
         }
         //Se não tiver um caminho de x até start
         else{
@@ -1230,26 +1245,30 @@ void dijkstraVector(grafoVectorComPeso grafo, int start, int objective=-1){
   }
   //Se tiver um objetivo
   else{
-    x = objective;
-    //Enquanto o objetivo não for o começo
-    if(x!=start){
-      //Imprime o caminho até o começo
-      cout<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
-      //Se tiver um caminho até x
-      if (distancia[x] != INF){
-        cout<<"[";
-        while(x != start){
-          //Cálculo a distância de x até start
-          cout<<x<<", ";
-          //x agora é quem descobriu x
-          x = pai[x];
+    //Se não tiver nenhum peso negativo
+    if(!control){
+      x = objective;
+      //Enquanto o objetivo não for o começo
+      if(x!=start){
+        //Imprime o caminho até o começo
+        cout<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
+        //Se tiver um caminho até x
+        if (distancia[x] != INF){
+          cout<<"[";
+          while(x != start){
+            //Cálculo a distância de x até start
+            cout<<x<<", ";
+            //x agora é quem descobriu x
+            x = pai[x];
+          }
+          cout<<x<<"], "<<"Distância entre eles: ";
+          printf("%.15g\n", distancia[objective]);
         }
-        cout<<x<<"], "<<"Distância entre eles: "<<distancia[objective]<<endl;
-      }
-      //Se não tiver um caminho de x até start
-      else{
-        //Imprime INFINITO
-        cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+        //Se não tiver um caminho de x até start
+        else{
+          //Imprime INFINITO
+          cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+        }
       }
     }
   }
@@ -1280,7 +1299,7 @@ double eccentricityVector(grafoVectorComPeso grafo, int start){
     //Itera sobre os vizinhos do vértice atual
     for (vector <pair <int,double> > ::iterator it = grafo.adjVector[current_vertex].begin(); it!=grafo.adjVector[current_vertex].end(); ++it){
       int vizinho = it->first;
-      int peso = it->second;
+      double peso = it->second;
       //Caso tenha achado um caminho melhor, ajusta a distância e insere no conjunto
       if (distancia[vizinho] > distancia[current_vertex] + peso){
         //Altera a distância de i
@@ -1306,10 +1325,10 @@ double eccentricityVector(grafoVectorComPeso grafo, int start){
 //Utilização pelo usuário(main)
 int main(){
   //grafoMatrizComPeso matriz = constroiMatrizComPeso("teste.txt");
-  grafoVectorComPeso vector = constroiVectorComPeso("grafo_5.txt");
+  grafoVectorComPeso vector = constroiVectorComPeso("rede_colaboracao.txt");
   clock_t start = clock();
   //getchar();
-  dijkstraVector(vector,1,50);
+  cout<<eccentricityVector(vector,1)<<endl;
   //dfsMatriz(1,matriz);
   clock_t end = clock();
   cout<< (double)(end-start)/CLOCKS_PER_SEC<< " segundos."<<endl;
