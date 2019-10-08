@@ -343,8 +343,8 @@ double primVector(grafoVectorComPeso grafo, string inicial, bool salve=false){
 
   //Imprime os vizinhos de Daniel R. Figueiredo e Edsger W. Dijkstra.
   //Cria duas variáveis inteiras
-  int daniel;
-  int dijkstra;
+  int daniel = 0;
+  int dijkstra = 0;
   //Percorre o grafo para descobrir a posição de Daniel
   for(int i=1;i<=grafo.numVertices;i++){
     if (grafo.referentes[i]=="Daniel R. Figueiredo"){
