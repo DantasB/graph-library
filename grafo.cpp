@@ -10,7 +10,7 @@
 #include <utility>  //Biblioteca com implementação do pair
 #include <set> //Biblioteca com implementação do set
 
-#define INF 0x3f3f3f3f //define um valor infinito
+#define INF 0x3f3f3f3f //Define um valor infinito
 
 using namespace std;
 
@@ -27,12 +27,12 @@ struct grafoMatriz{
 
 struct grafoMatrizComPeso{
   int numVertices;
-  float **adjMatriz;
+  double **adjMatriz;
 };
 
 struct grafoVectorComPeso{
   int numVertices;
-  vector< pair<int, float> >* adjVector;
+  vector< pair<int, double> >* adjVector;
 };
 
 //Funções extras
@@ -183,19 +183,19 @@ grafoMatriz constroiMatriz(string arquivo){
 grafoMatrizComPeso constroiMatrizComPeso(string arquivo){
   grafoMatrizComPeso grafo;
   int numVertices;
-  float **adjMatriz;
+  double **adjMatriz;
   int *grau;
   int numArestas=0;
   int vertex1, vertex2;
-  float peso;
+  double peso;
   ifstream graphTexto(arquivo.c_str());
   //Esse é o próprio número de vértices
   graphTexto >> numVertices;
   grafo.numVertices = numVertices;
   //Cria a Matriz de Adjacência
-  adjMatriz = new float*[numVertices+1];
+  adjMatriz = new double*[numVertices+1];
   for (int i = 0; i < numVertices+1; i++){
-        adjMatriz[i] = new float[numVertices+1];
+        adjMatriz[i] = new double[numVertices+1];
   }
 
   //Zera a Matriz de Adjacência
@@ -271,16 +271,16 @@ grafoVectorComPeso constroiVectorComPeso(string arquivo){
   grafoVectorComPeso grafo;
   int numVertices;
   int *grau;
-  vector < pair<int, float> > *adjVector;
+  vector < pair<int, double> > *adjVector;
   int numArestas=0;
   int vertex1, vertex2;
-  float peso;
+  double peso;
   ifstream graphTexto(arquivo.c_str());
   //Esse é o próprio número de vértices
   graphTexto >> numVertices;
   grafo.numVertices = numVertices;
   //Cria o vetor de adjacência
-  adjVector = new vector< pair<int, float> >[numVertices+1];
+  adjVector = new vector< pair<int, double> >[numVertices+1];
 
   //Inicializa o vetor grau
   grau = new int[numVertices+1]();
@@ -334,7 +334,7 @@ grafoVectorComPeso constroiVectorComPeso(string arquivo){
   grafo.adjVector = adjVector;
   //Imprime o grafo construido.
   /*
-  float v, w;
+  double v, w;
   for (int u = 1; u <= numVertices; u++) {
     cout << "Nó " << u << " faz adjacência com \n";
     for (auto it = adjVector[u].begin(); it!=adjVector[u].end(); it++)
@@ -858,133 +858,181 @@ int componentesConexasVector(grafoVector grafo, bool salve=false){
 }
 
 //Funções para Matriz de Adjacência com peso
-float primMatriz(grafoMatrizComPeso grafo, int origem, bool salve=false){
+double primMatriz(grafoMatrizComPeso grafo, int origem, bool salve=false){
   //Cria um vector de custo de tamanho número de vértices
-  vector <float> custo(grafo.numVertices+1, INF);
+  vector <double> custo(grafo.numVertices+1, INF);
   //Define o custo da origem = 0
   custo[origem] = 0;
-  // Cria vector com os pais = -1
+  //Cria vector inteiro com os pais = -1
   vector <int> pai (grafo.numVertices+1, -1);
+  //Cria vector inteiro com nível = 0
   vector <int> nivel (grafo.numVertices+1, 0);
+  //Cria vector boleano visitado = false
   vector < bool > visitado (grafo.numVertices+1, false);
-  // Cria o conjunto de vértices a serem percorridos (vasp)
-  set< pair<float, int> > vasp;
+  //Cria o conjunto de pair (peso,vértice) com os vértices a serem percorridos (vasp)
+  set< pair<double, int> > vasp;
+  //Insere o par peso, vértice no conjunto
   vasp.insert(make_pair(custo[origem], origem));
+  //Define o pai da origem como 0
   pai[origem] = 0;
   //Enquanto o conjunto tiver termos a serem percorridos
   while(!vasp.empty()){
-    // Escolhe os vértices de menor distância
-    float current_cost = vasp.begin()->first;
+    //Escolhe o vértice de menor distância
+    //Pega o peso do vértice de menor distância
+    double current_cost = vasp.begin()->first;
+    //Pega o vértice de menor distância
     int current_vertex = vasp.begin()->second;
+    //Visita o vértice
     visitado[current_vertex] = true;
-    // Remove o vértice do set e marca, indicando que foi percorrido
+    //Remove o vértice do set e marca, indicando que foi percorrido
     vasp.erase(make_pair(current_cost, current_vertex));
-    // Itera sobre os vizinhos do vértice atual sendo percorrido
+    //Itera sobre os vizinhos do vértice atual sendo percorrido
     for (int i = 0; i < grafo.numVertices+1; i++){
-        // Caso tenha achado um caminho melhor, ajusta a distância e insere no set
+        //Caso tenha achado um caminho melhor, ajusta a distância e insere no conjunto
         if (grafo.adjMatriz[current_vertex][i]>0){
+          //Se o custo de i > peso da aresta entre vértice atual e i
+          //E, se ele não tiver sido visitado
           if (custo[i] > grafo.adjMatriz[current_vertex][i] && !visitado[i]){
+            //Altera o custo.
             custo[i] = grafo.adjMatriz[current_vertex][i];
+            //Adiciona o par(custo, vértice)
             vasp.insert(make_pair(custo[i], i));
+            //Altera o pai
             pai[i] = current_vertex;
+            //Altera o nível
             nivel[i] = nivel[current_vertex]+1;
           }
         }
     }
   }
-  float custo_total = 0;
+  //Define uma variável que armazenará o custo_total da mst
+  double custo_total = 0;
+  //Itera sobre todos os vértices do grafo
   for (int i = 1; i <= grafo.numVertices; i++){
     custo_total += custo[i];
   }
+  //Se o usuário escolher salvar
   if(salve){
+    //Cria um arquivo mstFile
     ofstream mstFile;
     mstFile.open("mstfile.txt");
+    //Adiciona todos os dados da mst
     mstFile << "Custo total: "<<custo_total<<endl;
     for(int i=1;i<grafo.numVertices+1;i++){
       if (pai[i] != -1){
       mstFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
       }
     }
+    //Fecha o arquivo
     mstFile.close();
   }
+  //Retorna o custo total da mst
   return custo_total;
 }
 
 void dijkstraMatriz(grafoMatrizComPeso grafo, int start, int objective=-1){
-  //Cria um vector de custo de tamanho número de vértices
-  vector <float> distancia(grafo.numVertices+1, INF);
-
+  //Cria um vector de distancia de tamanho número de vértices
+  vector <double> distancia(grafo.numVertices+1, INF);
+  //Cria um array de pai
   int *pai;
   pai = new int[grafo.numVertices+1];
+  //Define o pai de todos os vértices como 0
   memset(pai,0,grafo.numVertices+1);
-
-  //Define o custo da origem = 0
+  //Define a distância da origem = 0
   distancia[start] = 0;
+  //Define o pai da origem = -1
   pai[start] = -1;
-  // Cria o conjunto de vértices a serem percorridos (vasp)
-  set< pair<float, int> > vasp;
+  //Cria o conjunto de vértices a serem percorridos (vasp)
+  set< pair<double, int> > vasp;
+  //Insere o par distância origem no conjunto vasp
   vasp.insert(make_pair(distancia[start], start));
   //Enquanto o conjunto tiver termos a serem percorridos
   while(!vasp.empty()){
-    // Escolhe os vértices de menor distância
-    float current_dist = vasp.begin()->first;
+    //Pega os vértices de menor distância
+    double current_dist = vasp.begin()->first;
+    //Se tiver peso negativo, para o código
     if(current_dist < 0){
       cout<<"Para executar dijkstra todos os pesos devem ser maiores que 0"<<endl;
       break;
     }
     int current_vertex = vasp.begin()->second;
-    // Remove o vértice do set e marca, indicando que foi percorrido
+    //Remove o vértice do set e marca, indicando que foi percorrido
     vasp.erase(make_pair(current_dist, current_vertex));
-    // Itera sobre os vizinhos do vértice atual sendo percorrido
+    //Itera sobre os vizinhos do vértice atual
     for (int i = 1; i < grafo.numVertices+1; i++){
-        // Caso tenha achado um caminho melhor, ajusta a distância e insere no set
+        //Caso tenha achado um caminho melhor, ajusta a distância e insere no conjunto
+        //Se existir a aresta.
         if (grafo.adjMatriz[current_vertex][i]>0){
+          //Se a distância de i for maior que a distância de seu vizinho + peso da aresta entre eles
           if (distancia[i] > distancia[current_vertex] + grafo.adjMatriz[current_vertex][i]){
+            //Altera pai[i]
             pai[i] = current_vertex;
+            //Altera distância[i]
             distancia[i] = distancia[current_vertex] + grafo.adjMatriz[current_vertex][i];
+            //Insere o par distancia[i], i no conjunto
             vasp.insert(make_pair(distancia[i], i));
           }
         }
     }
   }
+  //Cria um inteiro x
   int x=0;
-  float dist_valor = 0;
+  //Cria um double dist_valor
+  double dist_valor = 0;
+  //Se o usuário definir um vetor objetivo
   if(objective == -1){
+    //Para todos os vértices do grafo
     for (int i = 1; i < grafo.numVertices+1; i++){
+      //x será seu novo vértice objetivo
       x = i;
+      //Percorre x até chegar no vértice inicial
       if(x!=start){
+        //Imprime o caminho de x até start
         cout<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
+        //Se tiver um caminho até x
         if (distancia[x] != INF){
           cout<<"[";
           while(x != start){
+            //Cálculo a distância de x até start
             dist_valor += distancia[x];
             cout<<x<<", ";
+            //x agora é quem descobriu x
             x = pai[x];
           }
           cout<<x<<"], "<<"Distância entre eles: "<<dist_valor<<endl;
           dist_valor = 0;
         }
+        //Se não tiver um caminho de x até start
         else{
+          //Imprime INFINITO
           cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
         }
       }
     }
   }
+  //Se tiver um objetivo
   else{
     x = objective;
+    //Enquanto o objetivo não for o começo
     if(x!=start){
+      //Imprime o caminho até o começo
       cout<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
+      //Se tiver um caminho até x
       if (distancia[x] != INF){
         cout<<"[";
         while(x != start){
+          //Cálculo a distância de x até start
           dist_valor += distancia[x];
           cout<<x<<", ";
+          //x agora é quem descobriu x
           x = pai[x];
         }
         cout<<x<<"], "<<"Distância entre eles: "<<dist_valor<<endl;
         dist_valor = 0;
       }
+      //Se não tiver um caminho de x até start
       else{
+        //Imprime INFINITO
         cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
       }
     }
@@ -992,227 +1040,289 @@ void dijkstraMatriz(grafoMatrizComPeso grafo, int start, int objective=-1){
 }
 
 int eccentricityMatriz(grafoMatrizComPeso grafo, int start){
-  //Cria um vector de custo de tamanho número de vértices
-  vector <float> distancia(grafo.numVertices+1, INF);
-  //Define o custo da origem = 0
+  //Cria um vector de distância de tamanho número de vértices +1
+  vector <double> distancia(grafo.numVertices+1, INF);
+  //Define a distância até start = 0
   distancia[start] = 0;
-  // Cria o conjunto de vértices a serem percorridos (vasp)
-  set< pair<float, int> > vasp;
+  //Cria o conjunto de vértices a serem percorridos (vasp)
+  set< pair<double, int> > vasp;
   vasp.insert(make_pair(distancia[start], start));
   //Enquanto o conjunto tiver termos a serem percorridos
   while(!vasp.empty()){
-    // Escolhe os vértices de menor distância
-    float current_dist = vasp.begin()->first;
+    //Escolhe os vértices de menor distância
+    double current_dist = vasp.begin()->first;
+    //Se a distância for negativa
     if(current_dist < 0){
+      //Para o código
       cout<<"Para executar dijkstra todos os pesos devem ser maiores que 0"<<endl;
       break;
     }
     int current_vertex = vasp.begin()->second;
-    // Remove o vértice do set e marca, indicando que foi percorrido
+    //Remove o vértice do set e marca, indicando que foi percorrido
     vasp.erase(make_pair(current_dist, current_vertex));
-    // Itera sobre os vizinhos do vértice atual sendo percorrido
+    //Itera sobre os vizinhos do vértice atual
     for (int i = 1; i < grafo.numVertices+1; i++){
-        // Caso tenha achado um caminho melhor, ajusta a distância e insere no set
         if (grafo.adjMatriz[current_vertex][i]>0){
+          //Se a distância do vértice visitado for maior que distância de quem descobriu ele mais o peso entre eles
           if (distancia[i] > distancia[current_vertex] + grafo.adjMatriz[current_vertex][i]){
+            //Altera a distância de i
             distancia[i] = distancia[current_vertex] + grafo.adjMatriz[current_vertex][i];
+            //Insere o par distância e vértice i no conjunto
             vasp.insert(make_pair(distancia[i], i));
           }
         }
     }
   }
+  //Define uma váriavel minimo
   int min = 0;
+  //Percorre todos os vizinhos
   for (int i = 1; i < grafo.numVertices+1; i++){
+    //Pega a distância máxima
     if(distancia[i]>min && distancia[i] != INF){
       min = distancia[i];
     }
   }
+  //Retorna a maior distância
   return min;
 }
 
 //Funções para Vetor de Adjacência com peso
-float primVector(grafoVectorComPeso grafo, int origem, bool salve=false){
+double primVector(grafoVectorComPeso grafo, int origem, bool salve=false){
   //Cria um vector de custo de tamanho número de vértices
-  vector <float> custo(grafo.numVertices+1, INF);
+  vector <double> custo(grafo.numVertices+1, INF);
   //Define o custo da origem = 0
   custo[origem] = 0;
-  // Cria vector com os pais = -1
+  //Cria vector inteiro com os pais = -1
   vector <int> pai (grafo.numVertices+1, -1);
+  //Cria vector inteiro com nível = 0
   vector <int> nivel (grafo.numVertices+1, 0);
+  //Cria vector boleano visitado = false
   vector < bool > visitado (grafo.numVertices+1, false);
-  // Cria o conjunto de vértices a serem percorridos (vasp)
-  set< pair<float, int> > vasp;
+  //Cria o conjunto de pair (peso,vértice) com os vértices a serem percorridos (vasp)
+  set< pair<double, int> > vasp;
+  //Insere o par peso, vértice no conjunto
   vasp.insert(make_pair(custo[origem], origem));
+  //Define o pai da origem como 0
   pai[origem] = 0;
   //Enquanto o conjunto tiver termos a serem percorridos
   while(!vasp.empty()){
-    // Escolhe os vértices de menor distância
-    float current_cost = vasp.begin()->first;
+    //Escolhe o vértice de menor distância
+    //Pega o peso do vértice de menor distância
+    double current_cost = vasp.begin()->first;
+    //Pega o vértice de menor distância
     int current_vertex = vasp.begin()->second;
+    //Visita o vértice
     visitado[current_vertex] = true;
-    // Remove o vértice do set e marca, indicando que foi percorrido
+    //Remove o vértice do set e marca, indicando que foi percorrido
     vasp.erase(make_pair(current_cost, current_vertex));
-    // Itera sobre os vizinhos do vértice atual sendo percorrido
-    for (vector <pair <int,float> > ::iterator it = grafo.adjVector[current_vertex].begin(); it!=grafo.adjVector[current_vertex].end(); ++it){
+    //Itera sobre os vizinhos do vértice atual sendo percorrido
+    for (vector <pair <int,double> > ::iterator it = grafo.adjVector[current_vertex].begin(); it!=grafo.adjVector[current_vertex].end(); ++it){
       int vizinho = it->first;
       int peso = it->second;
-      // Caso tenha achado um caminho melhor, ajusta a distância e insere no set
+      //Caso tenha achado um caminho melhor, ajusta a distância e insere no conjunto
+      //Se o custo de i > peso da aresta entre vértice atual e i
+      //E, se ele não tiver sido visitado
       if (custo[vizinho] > peso && !visitado[vizinho]){
+        //Altera o custo.
         custo[vizinho] = peso;
+        //Adiciona o par(custo, vértice)
         vasp.insert(make_pair(custo[vizinho], vizinho));
+        //Altera o pai
         pai[vizinho] = current_vertex;
+        //Altera o nível
         nivel[vizinho] = nivel[current_vertex]+1;
       }
     }
   }
-  float custo_total = 0;
+  //Define uma variável que armazenará o custo_total da mst
+  double custo_total = 0;
+  //Itera sobre todos os vértices do grafo
   for (int i = 1; i <= grafo.numVertices; i++){
     custo_total += custo[i];
   }
+  //Se o usuário escolher salvar
   if(salve){
+    //Cria um arquivo mstFile
     ofstream mstFile;
     mstFile.open("mstfile.txt");
+    //Adiciona todos os dados da mst
     mstFile << "Custo total: "<<custo_total<<endl;
     for(int i=1;i<grafo.numVertices+1;i++){
       if (pai[i] != -1){
-      mstFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+        mstFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
       }
     }
+    //Fecha o arquivo
     mstFile.close();
   }
+  //Retorna o custo total da mst
   return custo_total;
 }
 
 void dijkstraVector(grafoVectorComPeso grafo, int start, int objective=-1){
-  //Cria um vector de custo de tamanho número de vértices
-  vector <float> distancia(grafo.numVertices+1, INF);
-
+  //Cria um vector de distancia de tamanho número de vértices
+  vector <double> distancia(grafo.numVertices+1, INF);
+  //Cria um array de pai
   int *pai;
   pai = new int[grafo.numVertices+1];
-
-  //Define o custo da origem = 0
+  //Define o pai de todos os vértices como 0
+  memset(pai,0,grafo.numVertices+1);
+  //Define a distância da origem = 0
   distancia[start] = 0;
+  //Define o pai da origem = -1
   pai[start] = -1;
-  // Cria o conjunto de vértices a serem percorridos (vasp)
-  set< pair<float, int> > vasp;
+  //Cria o conjunto de vértices a serem percorridos (vasp)
+  set< pair<double, int> > vasp;
+  //Insere o par distância origem no conjunto vasp
   vasp.insert(make_pair(distancia[start], start));
   //Enquanto o conjunto tiver termos a serem percorridos
   while(!vasp.empty()){
-    // Escolhe os vértices de menor distância
-    float current_dist = vasp.begin()->first;
+    //Pega os vértices de menor distância
+    double current_dist = vasp.begin()->first;
+    //Se tiver peso negativo, para o código
     if(current_dist < 0){
       cout<<"Para executar dijkstra todos os pesos devem ser maiores que 0"<<endl;
       break;
     }
     int current_vertex = vasp.begin()->second;
-    // Remove o vértice do set e marca, indicando que foi percorrido
+    //Remove o vértice do set e marca, indicando que foi percorrido
     vasp.erase(make_pair(current_dist, current_vertex));
-    // Itera sobre os vizinhos do vértice atual sendo percorrido
-    for (vector <pair <int,float> > ::iterator it = grafo.adjVector[current_vertex].begin(); it!=grafo.adjVector[current_vertex].end(); ++it){
+    //Itera sobre os vizinhos do vértice atual
+    for (vector <pair <int,double> > ::iterator it = grafo.adjVector[current_vertex].begin(); it!=grafo.adjVector[current_vertex].end(); ++it){
       int vizinho = it->first;
       int peso = it->second;
-      // Caso tenha achado um caminho melhor, ajusta a distância e insere no set
+      //Se a distância de i for maior que a distância de seu vizinho + peso da aresta entre eles
       if (distancia[vizinho] > distancia[current_vertex] + peso){
+        //Altera distância[i]
         distancia[vizinho] = distancia[current_vertex] + peso;
+        //Altera pai[i]
         pai[vizinho] = current_vertex;
+        //Caso tenha achado um caminho melhor, ajusta a distância e insere no conjunto
         vasp.insert(make_pair(distancia[vizinho], vizinho));
 
       }
     }
   }
+  //Cria um inteiro x
   int x=0;
-  float dist_valor = 0;
+  //Cria um double dist_valor
+  double dist_valor = 0;
+  //Se o usuário definir um vetor objetivo
   if(objective == -1){
+    //Para todos os vértices do grafo
     for (int i = 1; i < grafo.numVertices+1; i++){
+      //x será seu novo vértice objetivo
       x = i;
+      //Percorre x até chegar no vértice inicial
       if(x!=start){
+        //Imprime o caminho de x até start
         cout<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
+        //Se tiver um caminho até x
         if (distancia[x] != INF){
           cout<<"[";
           while(x != start){
+            //Cálculo a distância de x até start
             dist_valor += distancia[x];
             cout<<x<<", ";
+            //x agora é quem descobriu x
             x = pai[x];
           }
           cout<<x<<"], "<<"Distância entre eles: "<<dist_valor<<endl;
           dist_valor = 0;
         }
+        //Se não tiver um caminho de x até start
         else{
+          //Imprime INFINITO
           cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
         }
       }
     }
   }
+  //Se tiver um objetivo
   else{
     x = objective;
+    //Enquanto o objetivo não for o começo
     if(x!=start){
+      //Imprime o caminho até o começo
       cout<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
+      //Se tiver um caminho até x
       if (distancia[x] != INF){
         cout<<"[";
         while(x != start){
+          //Cálculo a distância de x até start
           dist_valor += distancia[x];
           cout<<x<<", ";
+          //x agora é quem descobriu x
           x = pai[x];
         }
         cout<<x<<"], "<<"Distância entre eles: "<<dist_valor<<endl;
         dist_valor = 0;
       }
+      //Se não tiver um caminho de x até start
       else{
+        //Imprime INFINITO
         cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
       }
     }
   }
 }
 
-float eccentricityVector(grafoVectorComPeso grafo, int start){
-  //Cria um vector de custo de tamanho número de vértices
-  vector <float> distancia(grafo.numVertices+1, INF);
-  //Define o custo da origem = 0
+double eccentricityVector(grafoVectorComPeso grafo, int start){
+  //Cria um vector de distância de tamanho número de vértices +1
+  vector <double> distancia(grafo.numVertices+1, INF);
+  //Define a distância até start = 0
   distancia[start] = 0;
-  // Cria o conjunto de vértices a serem percorridos (vasp)
-  set< pair<float, int> > vasp;
+  //Cria o conjunto de vértices a serem percorridos (vasp)
+  set< pair<double, int> > vasp;
+  //Insere o par distância, origem no conjunto
   vasp.insert(make_pair(distancia[start], start));
   //Enquanto o conjunto tiver termos a serem percorridos
   while(!vasp.empty()){
-    // Escolhe os vértices de menor distância
-    float current_dist = vasp.begin()->first;
+    //Escolhe os vértices de menor distância
+    double current_dist = vasp.begin()->first;
+    //Se a distância for negativa
     if(current_dist < 0){
+      //Para o código
       cout<<"Para executar dijkstra todos os pesos devem ser maiores que 0"<<endl;
       break;
     }
     int current_vertex = vasp.begin()->second;
-    // Remove o vértice do set e marca, indicando que foi percorrido
+    //Remove o vértice do set e marca, indicando que foi percorrido
     vasp.erase(make_pair(current_dist, current_vertex));
-    // Itera sobre os vizinhos do vértice atual sendo percorrido
-    for (vector <pair <int,float> > ::iterator it = grafo.adjVector[current_vertex].begin(); it!=grafo.adjVector[current_vertex].end(); ++it){
+    //Itera sobre os vizinhos do vértice atual
+    for (vector <pair <int,double> > ::iterator it = grafo.adjVector[current_vertex].begin(); it!=grafo.adjVector[current_vertex].end(); ++it){
       int vizinho = it->first;
       int peso = it->second;
-      // Caso tenha achado um caminho melhor, ajusta a distância e insere no set
+      //Caso tenha achado um caminho melhor, ajusta a distância e insere no conjunto
       if (distancia[vizinho] > distancia[current_vertex] + peso){
+        //Altera a distância de i
         distancia[vizinho] = distancia[current_vertex] + peso;
+        //Insere o par distância e vértice i no conjunto
         vasp.insert(make_pair(distancia[vizinho], vizinho));
-
       }
     }
   }
-  float min = 0;
+  //Define uma váriavel minimo
+  double min = 0;
+  //Percorre todos os vizinhos
   for (int i = 1; i < grafo.numVertices+1; i++){
+    //Pega a distância máxima
     if(distancia[i]>min && distancia[i] != INF){
       min = distancia[i];
     }
   }
+  //Retorna a maior distância
   return min;
 }
 
 //Utilização pelo usuário(main)
 int main(){
   //grafoMatrizComPeso matriz = constroiMatrizComPeso("teste.txt");
-  grafoVectorComPeso vector = constroiVectorComPeso("grafo_1.txt");
+  grafoVectorComPeso vector = constroiVectorComPeso("grafo_5.txt");
   clock_t start = clock();
   //getchar();
-  //dijkstraMatriz(matriz, 1);
-  dijkstraVector(vector, 1, 200);
+  dijkstraVector(vector,1,50);
   //dfsMatriz(1,matriz);
   clock_t end = clock();
-  cout<< (float)(end-start)/CLOCKS_PER_SEC<< " segundos."<<endl;
+  cout<< (double)(end-start)/CLOCKS_PER_SEC<< " segundos."<<endl;
 }
