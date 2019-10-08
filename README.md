@@ -19,6 +19,7 @@ A library constructed using c++17 and some others libraries made by Bruno Dantas
   - [Dijkstra](#dijkstra)
   - [Prim](#prim)
   - [Eccentricity](#eccentricity)
+- [Extra](#extra)
 
 ## How to use
 The library have two constructor methods that return us a type grafo. This type contains the number of Vertex and the graph built using the required structure.
@@ -72,3 +73,5 @@ The Prim is a algorithm able to build a MST (Minimum Spanning Tree).It's like th
 ### Eccentricity
 The Eccentricity is the longest shortest path between 2 vertex. In this implementation, it calculates the Eccentricity of a given vertex, so it just uses the [Dijkstra](#dijkstra) algorithm and pick up the longest distance in the distancia vector(Vector that contains the information of every distance from start vertex).
 
+## Extra
+The [colaboradores.cpp](https://github.com/DantasB/Graph-Library/blob/master/colaboradores.cpp) have the same implementation of the [graph.cpp](https://github.com/DantasB/Graph-Library/blob/master/grafo.cpp), but the data structure uses strings instead of integers. That's why one of the cases given by our professor had this requirement.
