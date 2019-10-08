@@ -978,7 +978,6 @@ void dijkstraMatriz(grafoMatrizComPeso grafo, int start, int objective=-1){
   //Cria um inteiro x
   int x=0;
   //Cria um double dist_valor
-  double dist_valor = 0;
   //Se o usuário definir um vetor objetivo
   if(objective == -1){
     //Para todos os vértices do grafo
@@ -994,13 +993,11 @@ void dijkstraMatriz(grafoMatrizComPeso grafo, int start, int objective=-1){
           cout<<"[";
           while(x != start){
             //Cálculo a distância de x até start
-            dist_valor += distancia[x];
             cout<<x<<", ";
             //x agora é quem descobriu x
             x = pai[x];
           }
-          cout<<x<<"], "<<"Distância entre eles: "<<dist_valor<<endl;
-          dist_valor = 0;
+          cout<<x<<"], "<<"Distância entre eles: "<<distancia[i]<<endl;
         }
         //Se não tiver um caminho de x até start
         else{
@@ -1021,14 +1018,11 @@ void dijkstraMatriz(grafoMatrizComPeso grafo, int start, int objective=-1){
       if (distancia[x] != INF){
         cout<<"[";
         while(x != start){
-          //Cálculo a distância de x até start
-          dist_valor += distancia[x];
           cout<<x<<", ";
           //x agora é quem descobriu x
           x = pai[x];
         }
-        cout<<x<<"], "<<"Distância entre eles: "<<dist_valor<<endl;
-        dist_valor = 0;
+        cout<<x<<"], "<<"Distância entre eles: "<<distancia[objective]<<endl;
       }
       //Se não tiver um caminho de x até start
       else{
@@ -1205,8 +1199,6 @@ void dijkstraVector(grafoVectorComPeso grafo, int start, int objective=-1){
   }
   //Cria um inteiro x
   int x=0;
-  //Cria um double dist_valor
-  double dist_valor = 0;
   //Se o usuário definir um vetor objetivo
   if(objective == -1){
     //Para todos os vértices do grafo
@@ -1222,13 +1214,11 @@ void dijkstraVector(grafoVectorComPeso grafo, int start, int objective=-1){
           cout<<"[";
           while(x != start){
             //Cálculo a distância de x até start
-            dist_valor += distancia[x];
             cout<<x<<", ";
             //x agora é quem descobriu x
             x = pai[x];
           }
-          cout<<x<<"], "<<"Distância entre eles: "<<dist_valor<<endl;
-          dist_valor = 0;
+          cout<<x<<"], "<<"Distância entre eles: "<<distancia[i]<<endl;
         }
         //Se não tiver um caminho de x até start
         else{
@@ -1250,13 +1240,11 @@ void dijkstraVector(grafoVectorComPeso grafo, int start, int objective=-1){
         cout<<"[";
         while(x != start){
           //Cálculo a distância de x até start
-          dist_valor += distancia[x];
           cout<<x<<", ";
           //x agora é quem descobriu x
           x = pai[x];
         }
-        cout<<x<<"], "<<"Distância entre eles: "<<dist_valor<<endl;
-        dist_valor = 0;
+        cout<<x<<"], "<<"Distância entre eles: "<<distancia[objective]<<endl;
       }
       //Se não tiver um caminho de x até start
       else{
