@@ -1219,8 +1219,6 @@ void dijkstraVector(grafoVectorComPeso grafo, int start, bool salve=false, int o
       if (distancia[vizinho] > distancia[current_vertex] + peso){
         //Altera distância[i]
         distancia[vizinho] = distancia[current_vertex] + peso;
-        if(vizinho == 10){
-        }
         //Altera pai[i]
         pai[vizinho] = current_vertex;
         //Caso tenha achado um caminho melhor, ajusta a distância e insere no conjunto
