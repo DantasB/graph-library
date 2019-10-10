@@ -69,7 +69,7 @@ grafoVectorComPeso constroiVectorComPeso(string arquivo, string refere){
   return grafo;
 }
 
-void dijkstraVector(grafoVectorComPeso grafo, string start, string objective="-1"){
+void dijkstraVector(grafoVectorComPeso grafo, string start, bool salve=false, string objective="-1"){
   //Cria duas variáveis inicio e objetivo (armazenarão as posições do início e objetivo)
   int inicio = 0;
   int objetivo = -1;
@@ -113,7 +113,7 @@ void dijkstraVector(grafoVectorComPeso grafo, string start, string objective="-1
       cout<<"Para executar dijkstra todos os pesos devem ser maiores que 0"<<endl;
       //Controle = 1
       control=1;
-      break;
+      return;
     }
     int current_vertex = vasp.begin()->second;
     //Remove o vértice do set e marca, indicando que foi percorrido
@@ -126,8 +126,6 @@ void dijkstraVector(grafoVectorComPeso grafo, string start, string objective="-1
       if (distancia[vizinho] > distancia[current_vertex] + peso){
         //Altera distância[i]
         distancia[vizinho] = distancia[current_vertex] + peso;
-        if(vizinho == 10){
-        }
         //Altera pai[i]
         pai[vizinho] = current_vertex;
         //Caso tenha achado um caminho melhor, ajusta a distância e insere no conjunto
@@ -136,63 +134,79 @@ void dijkstraVector(grafoVectorComPeso grafo, string start, string objective="-1
       }
     }
   }
-  //Cria um inteiro x
-  int x=0;
-  //Se o usuário definir um vetor objetivo
-  if(objetivo == -1 && !control){
-    //Para todos os vértices do grafo
-    for (int i = 1; i < grafo.numVertices+1; i++){
-      //x será seu novo vértice objetivo
-      x = i;
-      //Percorre x até chegar no vértice inicial
-      if(x!=inicio){
-        //Imprime o caminho de x até start
-        cout<<"Vértice: "<< grafo.referentes[x]<<", Caminho até "<<grafo.referentes[inicio]<<": ";
-        //Se tiver um caminho até x
-        if (distancia[x] != INF){
-          cout<<"[";
-          while(x != inicio){
-            //Cálculo a distância de x até start
-            cout<<grafo.referentes[x]<<", ";
-            //x agora é quem descobriu x
-            x = pai[x];
+  //Se o usuário quiser salvar os caminhos em um arquivo .txt
+  if (salve){
+    //Cria um arquivo mstFile
+    ofstream shortestPath;
+    shortestPath.open("shortestPath.txt");
+    //Define p como a precisão do arquivo mstFile;
+    streamsize p = shortestPath.precision();
+    //Cria um inteiro x
+    int x=0;
+    //Se o usuário definir um vetor objetivo
+    if(objetivo == -1 && !control){
+      //Para todos os vértices do grafo
+      for (int i = 1; i < grafo.numVertices+1; i++){
+        //x será seu novo vértice objetivo
+        x = i;
+        //Percorre x até chegar no vértice inicial
+        if(x!=inicio){
+          //Imprime o caminho de x até start
+          shortestPath<<"Vértice: "<< grafo.referentes[x]<<", Caminho até "<<grafo.referentes[inicio]<<": ";
+          //Se tiver um caminho até x
+          if (distancia[x] != INF){
+            shortestPath<<"[";
+            while(x != inicio){
+              //Cálculo a distância de x até start
+              shortestPath<<grafo.referentes[x]<<", ";
+              //x agora é quem descobriu x
+              x = pai[x];
+            }
+            shortestPath<<grafo.referentes[x]<<"], "<<"Distância entre eles: ";
+            //Altera a precisão do shortestPath
+            shortestPath.precision(15);
+            shortestPath<<distancia[i]<<endl;
+            //Retorna a precisão a precisão inicial do arquivo.
+            shortestPath.precision(p);
           }
-          cout<<grafo.referentes[x]<<"], "<<"Distância entre eles: ";
-          printf("%.15g\n", distancia[i]);
-        }
-        //Se não tiver um caminho de x até start
-        else{
-          //Imprime INFINITO
-          cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+          //Se não tiver um caminho de x até start
+          else{
+            //Imprime INFINITO
+            shortestPath<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+          }
         }
       }
     }
-  }
-  //Se tiver um objetivo
-  else{
-    //Se não tiver nenhum peso negativo
-    if(!control){
-      x = objetivo;
-      //Enquanto o objetivo não for o começo
-      if(x!=inicio){
-        //Imprime o caminho até o começo
-        cout<<"Vértice: "<< grafo.referentes[x]<<", Caminho até "<<grafo.referentes[inicio]<<": ";
-        //Se tiver um caminho até x
-        if (distancia[x] != INF){
-          cout<<"[";
-          while(x != inicio){
-            //Cálculo a distância de x até start
-            cout<<grafo.referentes[x]<<", ";
-            //x agora é quem descobriu x
-            x = pai[x];
+    //Se tiver um objetivo
+    else{
+      //Se não tiver nenhum peso negativo
+      if(!control){
+        x = objetivo;
+        //Enquanto o objetivo não for o começo
+        if(x!=inicio){
+          //Imprime o caminho até o começo
+          shortestPath<<"Vértice: "<< grafo.referentes[x]<<", Caminho até "<<grafo.referentes[inicio]<<": ";
+          //Se tiver um caminho até x
+          if (distancia[x] != INF){
+            shortestPath<<"[";
+            while(x != inicio){
+              //Cálculo a distância de x até start
+              shortestPath<<grafo.referentes[x]<<", ";
+              //x agora é quem descobriu x
+              x = pai[x];
+            }
+            shortestPath<<grafo.referentes[x]<<"], "<<"Distância entre eles: ";
+            //Altera a precisão do shortestPath
+            shortestPath.precision(15);
+            shortestPath<<distancia[objetivo]<<endl;
+            //Retorna a precisão a precisão inicial do arquivo.
+            shortestPath.precision(p);
           }
-          cout<<grafo.referentes[x]<<"], "<<"Distância entre eles: ";
-          printf("%.15g\n", distancia[objetivo]);
-        }
-        //Se não tiver um caminho de x até start
-        else{
-          //Imprime INFINITO
-          cout<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+          //Se não tiver um caminho de x até start
+          else{
+            //Imprime INFINITO
+            shortestPath<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+          }
         }
       }
     }
