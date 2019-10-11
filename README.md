@@ -20,21 +20,8 @@ A library constructed using c++17 and some others libraries made by Bruno Dantas
   - [Prim](#prim)
   - [Eccentricity](#eccentricity)
 - [Extra](#extra)
+- [Case Studies](#case-studies)
 
-
-## Case Studies:
-- Unweighted graph:
-  - [as_graph.txt](https://www.cos.ufrj.br/~daniel/grafos/data/as_graph.txt)
-  - [dblp.txt](https://www.cos.ufrj.br/~daniel/grafos/data/dblp.txt)
-  - [live_journal.txt](https://www.cos.ufrj.br/~daniel/grafos/data/live_journal.txt)
-- Weighted graph:
-  - [grafo_1.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_1.txt)
-  - [grafo_2.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_2.txt)
-  - [grafo_3.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_3.txt)
-  - [grafo_4.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_4.txt)
-  - [grafo_5.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_5.txt)
-  - [rede_colaboracao.txt](https://www.cos.ufrj.br/~daniel/grafos/data/rede_colaboracao.txt)
-  - [rede_colaboracao_vertices.txt](https://www.cos.ufrj.br/~daniel/grafos/data/rede_colaboracao_vertices.txt)
 
 ## How to use
 The library have two constructor methods that return us a type grafo. This type contains the number of Vertex and the graph built using the required structure.
@@ -90,3 +77,19 @@ The Eccentricity is the longest shortest path between 2 vertex. In this implemen
 
 ## Extra
 The [colaboradores.cpp](https://github.com/DantasB/Graph-Library/blob/master/colaboradores.cpp) have the same implementation of the [graph.cpp](https://github.com/DantasB/Graph-Library/blob/master/grafo.cpp), but the data structure uses strings instead of integers. That's why one of the cases given by our professor had this requirement.
+
+## Case Studies:
+"Below you can see all the case studies used"
+- Unweighted graph:
+  - [as_graph.txt](https://www.cos.ufrj.br/~daniel/grafos/data/as_graph.txt)
+  - [dblp.txt](https://www.cos.ufrj.br/~daniel/grafos/data/dblp.txt)
+  - [live_journal.txt](https://www.cos.ufrj.br/~daniel/grafos/data/live_journal.txt)
+- Weighted graph:
+  - [grafo_1.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_1.txt)
+  - [grafo_2.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_2.txt)
+  - [grafo_3.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_3.txt)
+  - [grafo_4.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_4.txt)
+  - [grafo_5.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_5.txt)
+  - [rede_colaboracao.txt](https://www.cos.ufrj.br/~daniel/grafos/data/rede_colaboracao.txt)
+  - [rede_colaboracao_vertices.txt](https://www.cos.ufrj.br/~daniel/grafos/data/rede_colaboracao_vertices.txt)
+
