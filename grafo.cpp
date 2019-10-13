@@ -40,6 +40,10 @@ bool comparaCC(vector<int> primeiro, vector<int> segundo){
    return primeiro.size() > segundo.size();
 }
 
+bool comparaSegundo(pair<int,int> a, pair<int,int> b){
+  return (a.second < b.second);
+}
+
 //Funções de construção das estruturas de dados
 grafoVector constroiVector(string arquivo){
   grafoVector grafo;
@@ -197,12 +201,11 @@ grafoMatrizComPeso constroiMatrizComPeso(string arquivo){
   for (int i = 0; i < numVertices+1; i++){
         adjMatriz[i] = new double[numVertices+1];
   }
-
-  //Zera a Matriz de Adjacência
-  for(int i=0;i< numVertices+1; i++){
-    memset(adjMatriz[i],0, numVertices+1);
+  for(int i=0;i<=numVertices;i++){
+    for(int j=0;j<=numVertices;j++){
+      adjMatriz[i][j]=INF;
+    }
   }
-
   //Cria um vetor de graus
   grau = new int[numVertices+1]();
   //Preenche a Matriz de Adjacência
@@ -297,10 +300,9 @@ grafoVectorComPeso constroiVectorComPeso(string arquivo){
   //Ordena o vetor grau em O(nlog(n))
   sort(grau, grau+numVertices+1);
 
-  //Ordena o vetor de Adjacência
-
-  for(int i=0;i<numVertices+1;i++){
-    sort(adjVector[i].begin(),adjVector[i].end());
+  //Ordena os vértices por peso
+  for(int i=0;i<=numVertices;i++){
+    sort(adjVector[i].begin(),adjVector[i].end(),comparaSegundo);
   }
 
   int soma=0;
@@ -887,9 +889,9 @@ double primMatriz(grafoMatrizComPeso grafo, int origem, bool salve=false){
     //Remove o vértice do set e marca, indicando que foi percorrido
     vasp.erase(make_pair(current_cost, current_vertex));
     //Itera sobre os vizinhos do vértice atual sendo percorrido
-    for (int i = 0; i < grafo.numVertices+1; i++){
+    for (int i = 1; i < grafo.numVertices+1; i++){
         //Caso tenha achado um caminho melhor, ajusta a distância e insere no conjunto
-        if (grafo.adjMatriz[current_vertex][i]>0){
+        if (grafo.adjMatriz[current_vertex][i]!= INF){
           //Se o custo de i > peso da aresta entre vértice atual e i
           //E, se ele não tiver sido visitado
           if (custo[i] > grafo.adjMatriz[current_vertex][i] && !visitado[i]){
@@ -909,7 +911,9 @@ double primMatriz(grafoMatrizComPeso grafo, int origem, bool salve=false){
   double custo_total = 0;
   //Itera sobre todos os vértices do grafo
   for (int i = 1; i <= grafo.numVertices; i++){
-    custo_total += custo[i];
+    if(custo[i]!= INF){
+      custo_total += custo[i];
+    }
   }
   //Se o usuário escolher salvar
   if(salve){
@@ -917,10 +921,12 @@ double primMatriz(grafoMatrizComPeso grafo, int origem, bool salve=false){
     ofstream mstFile;
     mstFile.open("mstfile.txt");
     //Adiciona todos os dados da mst
+    //Altera a precisão do mstFile
+    mstFile.precision(15);
     mstFile << "Custo total: "<<custo_total<<endl;
     for(int i=1;i<grafo.numVertices+1;i++){
-      if (pai[i] != -1){
-      mstFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+      if (pai[i] != 0){
+        mstFile<< i <<" "<< pai[i]<<" "<<custo[i]<<endl;
       }
     }
     //Fecha o arquivo
@@ -1158,7 +1164,9 @@ double primVector(grafoVectorComPeso grafo, int origem, bool salve=false){
   double custo_total = 0;
   //Itera sobre todos os vértices do grafo
   for (int i = 1; i <= grafo.numVertices; i++){
-    custo_total += custo[i];
+    if(custo[i]!= INF){
+      custo_total += custo[i];
+    }
   }
   //Se o usuário escolher salvar
   if(salve){
@@ -1166,10 +1174,13 @@ double primVector(grafoVectorComPeso grafo, int origem, bool salve=false){
     ofstream mstFile;
     mstFile.open("mstfile.txt");
     //Adiciona todos os dados da mst
+    //Altera a precisão do mstFile
+    mstFile.precision(15);
     mstFile << "Custo total: "<<custo_total<<endl;
+    //Retorna a precisão a precisão inicial do arquivo.
     for(int i=1;i<grafo.numVertices+1;i++){
-      if (pai[i] != -1){
-        mstFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
+      if (pai[i] > 0){
+        mstFile<< i <<" "<< pai[i]<<" "<<custo[i]<<endl;
       }
     }
     //Fecha o arquivo
@@ -1357,12 +1368,17 @@ double eccentricityVector(grafoVectorComPeso grafo, int start){
 
 //Utilização pelo usuário(main)
 int main(){
-  //grafoMatrizComPeso matriz = constroiMatrizComPeso("teste.txt");
-  grafoVectorComPeso vector = constroiVectorComPeso("rede_colaboracao.txt");
+  grafoMatrizComPeso matriz = constroiMatrizComPeso("grafo_2.txt");
+  grafoVectorComPeso vector = constroiVectorComPeso("grafo_2.txt");
   clock_t start = clock();
   //getchar();
-  cout<<eccentricityVector(vector,1)<<endl;
-  //dfsMatriz(1,matriz);
+  primVector(vector,1);
   clock_t end = clock();
-  cout<< (double)(end-start)/CLOCKS_PER_SEC<< " segundos."<<endl;
+  cout<<"Tempo Prim Vector: "<<(double)(end-start)/CLOCKS_PER_SEC<< " segundos."<<endl;
+  clock_t start1 = clock();
+  //getchar();
+  primMatriz(matriz,1);
+  clock_t end1 = clock();
+  cout<<"Tempo Prim Matriz: "<<(double)(end1-start1)/CLOCKS_PER_SEC<< " segundos."<<endl;
+
 }
