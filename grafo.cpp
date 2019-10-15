@@ -353,7 +353,7 @@ grafoVectorComPeso constroiVectorComPeso(string arquivo){
 }
 
 //Funções para Matriz de Adjacência
-void bfsMatriz(int start, grafoMatriz grafo, bool salve=false){
+void bfsMatriz(int start, grafoMatriz grafo, bool salve=false, int objetivo = -1){
   //Cria um vetor de niveis
   int *nivel;
   nivel = new int[grafo.numVertices+1];
@@ -395,9 +395,38 @@ void bfsMatriz(int start, grafoMatriz grafo, bool salve=false){
       bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
     }
     bfsFile.close();
+    //Cria um arquivo mstFile
+    //Cria um inteiro x
+    int x=0;
+    //x será seu novo vértice objetivo
+    x = objetivo;
+    if(x!=-1){
+      ofstream shortestPath;
+      shortestPath.open("shortestPath.txt");
+      //Percorre x até chegar no vértice inicial
+      if(x!=start){
+        //Imprime o caminho de x até start
+        shortestPath<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
+        //Se tiver um caminho até x
+        if (nivel[x] !=-1){
+          shortestPath<<"[";
+          while(x != start){
+            //Cálculo a distância de x até start
+            shortestPath<<x<<", ";
+            //x agora é quem descobriu x
+            x = pai[x];
+          }
+          shortestPath<<x<<"]";
+        }
+        //Se não tiver um caminho de x até start
+        else{
+          //Imprime INFINITO
+          shortestPath<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+        }
+      }
+    }
   }
 }
-
 void dfsMatriz(int start, grafoMatriz grafo, bool salve=false){
   //Cria um vetor para inverter os itens a adicionar na pilha
   vector<int>addPilha;
@@ -609,7 +638,7 @@ int componentesConexasMatriz(grafoMatriz grafo, bool salve=false){
 }
 
 //Funções para Vetor de Adjacência
-void bfsVector(int start, grafoVector grafo, bool salve=false){
+void bfsVector(int start, grafoVector grafo, bool salve=false, int objetivo = -1){
   //Cria um vetor de niveis
   int *nivel;
   nivel = new int[grafo.numVertices+1];
@@ -652,6 +681,36 @@ void bfsVector(int start, grafoVector grafo, bool salve=false){
       bfsFile<< "Vértice: "<< i <<", Nível: "<< nivel[i]<<", Pai: "<< pai[i]<<endl;
     }
     bfsFile.close();
+    //Cria um arquivo mstFile
+    //Cria um inteiro x
+    int x=0;
+    //x será seu novo vértice objetivo
+    x = objetivo;
+    if(x!=-1){
+      ofstream shortestPath;
+      shortestPath.open("shortestPath.txt");
+      //Percorre x até chegar no vértice inicial
+      if(x!=start){
+        //Imprime o caminho de x até start
+        shortestPath<<"Vértice: "<< x<<", Caminho até "<<start<<": ";
+        //Se tiver um caminho até x
+        if (nivel[x] !=-1){
+          shortestPath<<"[";
+          while(x != start){
+            //Cálculo a distância de x até start
+            shortestPath<<x<<", ";
+            //x agora é quem descobriu x
+            x = pai[x];
+          }
+          shortestPath<<x<<"]";
+        }
+        //Se não tiver um caminho de x até start
+        else{
+          //Imprime INFINITO
+          shortestPath<<"[], "<<"Distância entre eles: "<<"INFINITO"<<endl;
+        }
+      }
+    }
   }
 }
 
