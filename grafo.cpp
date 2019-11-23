@@ -18,11 +18,15 @@ using namespace std;
 struct grafoVector{
   int numVertices;
   vector<int>* adjVector;
+  vector<int> bipartite_1;
+  vector<int> bipartite_2;
 };
 
 struct grafoMatriz{
   int numVertices;
   bool **adjMatriz;
+  vector<int> bipartite_1;
+  vector<int> bipartite_2;
 };
 
 struct grafoMatrizComPeso{
@@ -184,7 +188,7 @@ grafoMatriz constroiMatriz(string arquivo){
   return grafo;
 }
 
-grafoMatrizComPeso constroiMatrizComPeso(string arquivo){
+grafoMatrizComPeso constroiMatrizComPeso(string arquivo, bool directed=false){
   grafoMatrizComPeso grafo;
   int numVertices;
   double **adjMatriz;
@@ -212,10 +216,11 @@ grafoMatrizComPeso constroiMatrizComPeso(string arquivo){
   while(graphTexto>>vertex1>>vertex2>>peso){
     //Insere o par (vértice1, vértice2) na matriz
     adjMatriz[vertex1][vertex2]=peso;
-    adjMatriz[vertex2][vertex1]=peso;
-    //Calcula o grau de cada vértice
     grau[vertex1]++;
-    grau[vertex2]++;
+    if(!directed){
+      adjMatriz[vertex2][vertex1]=peso;
+      grau[vertex2]++;
+    }
   }
 
   //Ordena em O(n.log(n)) o vetor de graus.
@@ -270,7 +275,7 @@ grafoMatrizComPeso constroiMatrizComPeso(string arquivo){
   return grafo;
 }
 
-grafoVectorComPeso constroiVectorComPeso(string arquivo){
+grafoVectorComPeso constroiVectorComPeso(string arquivo, bool directed=false){
   grafoVectorComPeso grafo;
   int numVertices;
   int *grau;
@@ -291,10 +296,11 @@ grafoVectorComPeso constroiVectorComPeso(string arquivo){
   //Preenche o vetor de adjacência
   while(graphTexto>>vertex1>>vertex2>>peso){
     adjVector[vertex1].push_back(make_pair(vertex2, peso));
-    adjVector[vertex2].push_back(make_pair(vertex1, peso));
-    //Calcula o grau de cada vértice
     grau[vertex1]++;
-    grau[vertex2]++;
+    if(!directed){
+      adjVector[vertex2].push_back(make_pair(vertex1, peso));
+      grau[vertex2]++;
+    }
   }
 
   //Ordena o vetor grau em O(nlog(n))
@@ -637,6 +643,60 @@ int componentesConexasMatriz(grafoMatriz grafo, bool salve=false){
   return constante;
 }
 
+bool bipartidoMatriz(grafoMatriz grafo){
+  //Cria um vetor de visitados
+  int *visited;
+  visited = new int[grafo.numVertices+1];
+  //Define o vetor visitado = 0
+  for(int i=0;i<=grafo.numVertices+1;i++){
+    visited[i] = 0;
+  }
+  //Cria uma fila
+  queue<int> fila;
+  int start = 1;
+  //Adiciona o start a fila
+  fila.push(start);
+  //Define o visited do start como 1
+  visited[start]=1;
+  //Enquanto a fila não estiver vazia
+  while(!fila.empty()){
+    //Tira o primeiro elemento da fila
+    int v = fila.front();
+    //cout<<v<<endl;
+    fila.pop();
+    //Para todos os vizinhos da fila
+    for(int i=1;i<(int)grafo.numVertices+1;i++){
+      if(grafo.adjMatriz[v][i]){
+        if(visited[i]==0){
+          if (visited[v] == 1){
+            visited[i] = 2;
+          }
+          else{
+            if(visited[v] ==2){
+              visited[i] = 1;
+            }
+          }
+          fila.push(i);
+        }
+        else{
+          if(visited[i] == visited[v]){
+            return false;
+          }
+        }
+      }
+    }
+  }
+  for(int i=0;i<grafo.numVertices+1;i++){
+    if(visited[i]==1){
+      grafo.bipartite_1.push_back(i);
+    }
+    if(visited[i]==2){
+      grafo.bipartite_2.push_back(i);
+    }
+  }
+  return true;
+}
+
 //Funções para Vetor de Adjacência
 void bfsVector(int start, grafoVector grafo, bool salve=false, int objetivo = -1){
   //Cria um vetor de niveis
@@ -916,6 +976,58 @@ int componentesConexasVector(grafoVector grafo, bool salve=false){
     }
   }
   return constante;
+}
+
+bool bipartidoVector(grafoVector grafo){
+  //Cria um vetor de visitados
+  int *visited;
+  visited = new int[grafo.numVertices+1];
+  //Define o vetor visitado = 0
+  for(int i=0;i<=grafo.numVertices+1;i++){
+    visited[i] = 0;
+  }
+  //Cria uma fila
+  queue<int> fila;
+  int start = 1;
+  //Adiciona o start a fila
+  fila.push(start);
+  //Define o visited do start como 1
+  visited[start]=1;
+  //Enquanto a fila não estiver vazia
+  while(!fila.empty()){
+    //Tira o primeiro elemento da fila
+    int v = fila.front();
+    //cout<<v<<endl;
+    fila.pop();
+    //Para todos os vizinhos da fila
+    for(int i=0;i<(int)grafo.adjVector[v].size();i++){
+      if(visited[grafo.adjVector[v][i]]==0){
+        if (visited[v] == 1){
+          visited[grafo.adjVector[v][i]] = 2;
+        }
+        else{
+          if(visited[v] ==2){
+            visited[grafo.adjVector[v][i]] = 1;
+          }
+        }
+        fila.push(grafo.adjVector[v][i]);
+      }
+      else{
+        if(visited[grafo.adjVector[v][i]] == visited[v]){
+          return false;
+        }
+      }
+    }
+  }
+  for(int i=0;i<grafo.numVertices+1;i++){
+    if(visited[i]==1){
+      grafo.bipartite_1.push_back(i);
+    }
+    if(visited[i]==2){
+      grafo.bipartite_2.push_back(i);
+    }
+  }
+  return true;
 }
 
 //Funções para Matriz de Adjacência com peso
@@ -1424,6 +1536,10 @@ double eccentricityVector(grafoVectorComPeso grafo, int start){
   //Retorna a maior distância
   return min;
 }
+
+//Funções para Vetor de Adjacência Direcionado com peso
+
+//Funções para Matriz de Adjacência Direcionado com peso
 
 //Utilização pelo usuário(main)
 int main(){
