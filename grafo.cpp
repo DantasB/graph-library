@@ -11,8 +11,12 @@
 #include <set> //Biblioteca com implementação do set
 
 #define INF 0x3f3f3f3f //Define um valor infinito
-
+#define NIL -1
 using namespace std;
+
+//Vetores Globais
+vector<int> pairU;
+vector<int> dist;
 
 //Estruturas criadas
 struct grafoVector{
@@ -46,6 +50,170 @@ bool comparaCC(vector<int> primeiro, vector<int> segundo){
 
 bool comparaSegundo(pair<int,int> a, pair<int,int> b){
   return (a.second < b.second);
+}
+
+bool bfsHopVector(grafoVector grafo){
+  queue<int> Q;
+  for(int j=0;j<=(int)grafo.numVertices;j++){
+    dist.push_back(NIL);
+  }
+  for (int u=1; u<=(int)grafo.numVertices; u++){
+    if(pairU[u]==NIL){
+      dist[u] = 0;
+      Q.push(u);
+    }
+  }
+  bool reached = false;
+  while (!Q.empty()){
+    int k = Q.front();
+    Q.pop();
+    for (int i=0; i<=(int)grafo.adjVector[k].size(); i++) {
+      int v = grafo.adjVector[k][i];
+      if (pairU[v] == NIL){
+        reached = true;
+      }
+      else if(dist[pairU[v]] == NIL) {
+          dist[pairU[v]] = dist[k] + 1;
+          Q.push(pairU[v]);
+        }
+    }
+  }
+  return reached;
+}
+
+bool dfsHopVector(grafoVector grafo, int u) {
+  if (u == NIL){
+    return true;
+  }
+  for (int i=0; i<=(int)grafo.adjVector[u].size(); i++){
+    int v = grafo.adjVector[u][i];
+    if(pairU[v] == -1 || dist[pairU[v]] == dist[u]+1){
+      if (dfsHopVector(grafo, pairU[v])){
+        pairU[v] = u;
+        pairU[u] = v;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool bfsHopMatriz(grafoMatriz grafo){
+  queue<int> Q;
+  for(int j=0;j<=(int)grafo.numVertices;j++){
+    dist.push_back(NIL);
+  }
+  for (int u=1; u<=(int)grafo.numVertices; u++){
+    if(pairU[u]==NIL){
+      dist[u] = 0;
+      Q.push(u);
+    }
+  }
+  bool reached = false;
+  while (!Q.empty()){
+    int k = Q.front();
+    Q.pop();
+    for (int i=1; i<=grafo.numVertices; i++){
+      if (grafo.adjMatriz[k][i]){
+        int v = i;
+        if (pairU[v] == NIL){
+          reached = true;
+        }
+        else if(dist[pairU[v]] == NIL) {
+            dist[pairU[v]] = dist[k] + 1;
+            Q.push(pairU[v]);
+          }
+      }
+    }
+  }
+  return reached;
+}
+
+bool dfsHopMatriz(grafoMatriz grafo, int u) {
+  if (u == NIL){
+    return true;
+  }
+  for (int i=1; i<=grafo.numVertices; i++){
+    if (grafo.adjMatriz[u][i]){
+      int v = i;
+      if(pairU[v] == -1 || dist[pairU[v]] == dist[u]+1){
+        if (dfsHopMatriz(grafo, pairU[v])){
+          pairU[v] = u;
+          pairU[u] = v;
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+vector<int> bfsCCMatriz(grafoMatriz grafo, int start, vector<int>&descoberto, int constante){
+  //Cria um vector de componentes e adiciona o vertice que está iniciando a bfs
+  vector<int> componentesMatriz;
+  componentesMatriz.push_back(start);
+  //Cria uma fila
+  queue<int> fila;
+  //Seta o start como descoberto
+  descoberto[start] = constante;
+  //Adiciona o start a fila
+  fila.push(start);
+  //Enquanto a fila não estiver vazia
+  while (!fila.empty()) {
+    //Pega o primeiro elemento da fila
+    int vertex = fila.front();
+    fila.pop();
+    //Faz um iterator dos vizinhos da fila.front()
+    for (int i=1;i<(int)grafo.numVertices+1;i++){
+      //Vizinho é o *it
+      int vizinho = i;
+      //Se esse vizinho não tiver sido descoberto
+      if (!descoberto[vizinho] && grafo.adjMatriz[vertex][vizinho]) {
+        //Vizinho pertence a mesma componente conexa do start
+        descoberto[vizinho] = constante;
+        //Adiciona o vizinho ao final do vector de componentes
+        componentesMatriz.push_back(vizinho);
+        //Adiciona o vizinho a fila
+        fila.push(vizinho);
+      }
+    }
+  }
+  //Retorna o componentes Matriz para adicionar a lista de componentes conexas
+  return componentesMatriz;
+}
+
+vector<int> bfsCCVector(grafoVector grafo, int start, vector<int>&descoberto, int constante){
+  //Cria um vector de componentes e adiciona o vertice que está iniciando a bfs
+  vector<int> componentesVector;
+  componentesVector.push_back(start);
+  //Cria uma fila
+  queue<int> fila;
+  //Seta o start como descoberto
+  descoberto[start] = constante;
+  //Adiciona o start a fila
+  fila.push(start);
+  //Enquanto a fila não estiver vazia
+  while (!fila.empty()) {
+    //Pega o primeiro elemento da fila
+    int vertex = fila.front();
+    fila.pop();
+    //Faz um iterator dos vizinhos da fila.front()
+    for (int i=0;i<(int)grafo.adjVector[vertex].size();i++){
+      //Vizinho é o *it
+      int vizinho = i;
+      //Se esse vizinho não tiver sido descoberto
+      if (!descoberto[grafo.adjVector[vertex][vizinho]]) {
+        //Vizinho pertence a mesma componente conexa do start
+        descoberto[grafo.adjVector[vertex][vizinho]] = constante;
+        //Adiciona o vizinho ao final do vector de componentes
+        componentesVector.push_back(grafo.adjVector[vertex][vizinho]);
+        //Adiciona o vizinho a fila
+        fila.push(grafo.adjVector[vertex][vizinho]);
+      }
+    }
+  }
+  //Retorna o componentes Vector para adicionar a lista de componentes conexas
+  return componentesVector;
 }
 
 //Funções de construção das estruturas de dados
@@ -433,6 +601,7 @@ void bfsMatriz(int start, grafoMatriz grafo, bool salve=false, int objetivo = -1
     }
   }
 }
+
 void dfsMatriz(int start, grafoMatriz grafo, bool salve=false){
   //Cria um vetor para inverter os itens a adicionar na pilha
   vector<int>addPilha;
@@ -573,40 +742,6 @@ int diametroMatriz(grafoMatriz grafo){
       }
     }
     return maiornivel;
-}
-
-vector<int> bfsCCMatriz(grafoMatriz grafo, int start, vector<int>&descoberto, int constante){
-  //Cria um vector de componentes e adiciona o vertice que está iniciando a bfs
-  vector<int> componentesMatriz;
-  componentesMatriz.push_back(start);
-  //Cria uma fila
-  queue<int> fila;
-  //Seta o start como descoberto
-  descoberto[start] = constante;
-  //Adiciona o start a fila
-  fila.push(start);
-  //Enquanto a fila não estiver vazia
-  while (!fila.empty()) {
-    //Pega o primeiro elemento da fila
-    int vertex = fila.front();
-    fila.pop();
-    //Faz um iterator dos vizinhos da fila.front()
-    for (int i=1;i<(int)grafo.numVertices+1;i++){
-      //Vizinho é o *it
-      int vizinho = i;
-      //Se esse vizinho não tiver sido descoberto
-      if (!descoberto[vizinho] && grafo.adjMatriz[vertex][vizinho]) {
-        //Vizinho pertence a mesma componente conexa do start
-        descoberto[vizinho] = constante;
-        //Adiciona o vizinho ao final do vector de componentes
-        componentesMatriz.push_back(vizinho);
-        //Adiciona o vizinho a fila
-        fila.push(vizinho);
-      }
-    }
-  }
-  //Retorna o componentes Matriz para adicionar a lista de componentes conexas
-  return componentesMatriz;
 }
 
 int componentesConexasMatriz(grafoMatriz grafo, bool salve=false){
@@ -908,40 +1043,6 @@ int diametroVector(grafoVector grafo){
       }
     }
     return maiornivel;
-}
-
-vector<int> bfsCCVector(grafoVector grafo, int start, vector<int>&descoberto, int constante){
-  //Cria um vector de componentes e adiciona o vertice que está iniciando a bfs
-  vector<int> componentesVector;
-  componentesVector.push_back(start);
-  //Cria uma fila
-  queue<int> fila;
-  //Seta o start como descoberto
-  descoberto[start] = constante;
-  //Adiciona o start a fila
-  fila.push(start);
-  //Enquanto a fila não estiver vazia
-  while (!fila.empty()) {
-    //Pega o primeiro elemento da fila
-    int vertex = fila.front();
-    fila.pop();
-    //Faz um iterator dos vizinhos da fila.front()
-    for (int i=0;i<(int)grafo.adjVector[vertex].size();i++){
-      //Vizinho é o *it
-      int vizinho = i;
-      //Se esse vizinho não tiver sido descoberto
-      if (!descoberto[grafo.adjVector[vertex][vizinho]]) {
-        //Vizinho pertence a mesma componente conexa do start
-        descoberto[grafo.adjVector[vertex][vizinho]] = constante;
-        //Adiciona o vizinho ao final do vector de componentes
-        componentesVector.push_back(grafo.adjVector[vertex][vizinho]);
-        //Adiciona o vizinho a fila
-        fila.push(grafo.adjVector[vertex][vizinho]);
-      }
-    }
-  }
-  //Retorna o componentes Vector para adicionar a lista de componentes conexas
-  return componentesVector;
 }
 
 int componentesConexasVector(grafoVector grafo, bool salve=false){
@@ -1539,21 +1640,47 @@ double eccentricityVector(grafoVectorComPeso grafo, int start){
 
 //Funções para Vetor de Adjacência Direcionado com peso
 
+int hopcroftKarpVector(grafoVector grafo){
+  for (int u=0; u<(int)grafo.numVertices+1; u++){
+    pairU.push_back(NIL);
+  }
+  int result = 0;
+  while (bfsHopVector(grafo)){
+    for (int u=1; u<=(int)grafo.numVertices; u++){
+      if (pairU[u]==NIL && dfsHopVector(grafo, u)){
+        result++;
+      }
+    }
+  }
+  return result;
+}
+
 //Funções para Matriz de Adjacência Direcionado com peso
+
+int hopcroftKarpMatriz(grafoMatriz grafo){
+  for (int u=0; u<(int)grafo.numVertices+1; u++){
+    pairU.push_back(NIL);
+  }
+  int result = 0;
+  while (bfsHopMatriz(grafo)){
+    for (int u=1; u<=(int)grafo.numVertices; u++){
+      if (pairU[u]==NIL && dfsHopMatriz(grafo, u)){
+        result++;
+      }
+    }
+  }
+  return result;
+}
 
 //Utilização pelo usuário(main)
 int main(){
-  grafoMatrizComPeso matriz = constroiMatrizComPeso("grafo_2.txt");
-  grafoVectorComPeso vector = constroiVectorComPeso("grafo_2.txt");
+  grafoMatriz vector = constroiMatriz("teste.txt");
+  //grafoVectorComPeso vector = constroiVectorComPeso("grafo_2.txt");
   clock_t start = clock();
   //getchar();
-  primVector(vector,1);
+  cout<<hopcroftKarpMatriz(vector)<<endl;
   clock_t end = clock();
   cout<<"Tempo Prim Vector: "<<(double)(end-start)/CLOCKS_PER_SEC<< " segundos."<<endl;
-  clock_t start1 = clock();
-  //getchar();
-  primMatriz(matriz,1);
-  clock_t end1 = clock();
-  cout<<"Tempo Prim Matriz: "<<(double)(end1-start1)/CLOCKS_PER_SEC<< " segundos."<<endl;
+
 
 }
