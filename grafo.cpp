@@ -332,6 +332,146 @@ bool dfsHopMatriz(grafoMatriz grafo, int n){
   return false;
 }
 
+bool bfCoreMatriz(grafoMatrizComPeso grafo, int start){
+  int n = grafo.numVertices+1;
+  d.assign(n, INF);
+  bool p;
+  p = false;
+  d[start] = 0;
+  for(int i=0;i<grafo.numVertices-1;i++){
+    p = false;
+    for(int w=1;w<grafo.numVertices+1;w++){
+      for (int v=1;v<=grafo.numVertices;v++){
+        if (grafo.adjMatriz[w][v]!= INF){
+          if (d[v] > d[w] + grafo.adjMatriz[w][v]){
+            d[v] = d[w] + grafo.adjMatriz[w][v];
+            p=true;
+          }
+          else{
+            p=false;
+          }
+        }
+      }
+      if (p==false){
+        break;
+      }
+    }
+  }
+  for (int i=1; i<grafo.numVertices+1;i++){
+    for (int j=1;j<grafo.numVertices+1;j++){
+      if (grafo.adjMatriz[i][j]!=INF){
+        if (d[j] > d[i] + grafo.adjMatriz[i][j]){
+          return false;
+        }
+      }
+    }
+  }
+  return true;
+}
+
+bool bfCoreVector(grafoVectorComPeso grafo, int start){
+  int n = grafo.numVertices+1;
+  d.assign(n, INF);
+  bool p;
+  p = false;
+  d[start] = 0;
+  for(int i=0;i<grafo.numVertices-1;i++){
+    p = false;
+    for(int w=0;w<(int)grafo.adjVector[i].size();w++){
+      for (vector <pair <int,double> > ::iterator it = grafo.adjVector[w].begin(); it!=grafo.adjVector[w].end(); ++it){
+        int vizinho = it->first;
+        double peso = it->second;
+        if (d[vizinho] > d[w] + peso){
+          d[vizinho] = d[w] + peso;
+          p=true;
+        }
+        else{
+          p=false;
+        }
+        if (p==false){
+          break;
+        }
+      }
+    }
+  }
+  for (int i=0; i<grafo.numVertices+1;i++){
+    for (vector <pair <int,double> > ::iterator it = grafo.adjVector[i].begin(); it!=grafo.adjVector[i].end(); ++it){
+      int vizinho = it->first;
+      double peso = it->second;
+      if (d[vizinho] > d[i] + peso){
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+bool spfaCoreVector(grafoVectorComPeso grafo, int s){
+  int n = grafo.numVertices+1;
+  d.assign(n, INF);
+  vector<int> cnt(n, 0);
+  vector<bool> inqueue(n, false);
+  queue<int> q;
+  d[s] = 0;
+  q.push(s);
+  inqueue[s] = true;
+  while (!q.empty()) {
+    int v = q.front();
+    q.pop();
+    inqueue[v] = false;
+    for (vector <pair <int,double> > ::iterator it = grafo.adjVector[v].begin(); it!=grafo.adjVector[v].end(); ++it){
+      int to = it->first;
+      double len = it->second;
+      if (d[v] + len < d[to]) {
+        d[to] = d[v] + len;
+        if (!inqueue[to]) {
+          q.push(to);
+          inqueue[to] = true;
+          cnt[to]++;
+          if (cnt[to] > n){
+            return false;  // negative cycle
+          }
+        }
+      }
+    }
+  }
+  return true;
+}
+
+bool spfaCoreMatriz(grafoMatrizComPeso grafo, int s){
+
+  int n = grafo.numVertices+1;
+  d.assign(n, INF);
+  vector<int> cnt(n, 0);
+  vector<bool> inqueue(n, false);
+  queue<int> q;
+  d[s] = 0;
+  q.push(s);
+  inqueue[s] = true;
+  while (!q.empty()) {
+    int v = q.front();
+    q.pop();
+    inqueue[v] = false;
+    for (int i = 1; i < grafo.numVertices+1; i++){
+      if (grafo.adjMatriz[v][i]!=INF){
+        int to = i;
+        double len = grafo.adjMatriz[v][i];
+        if (d[v] + len < d[to]) {
+          d[to] = d[v] + len;
+          if (!inqueue[to]) {
+            q.push(to);
+            inqueue[to] = true;
+            cnt[to]++;
+            if (cnt[to] > n){
+              return false;  // negative cycle
+            }
+          }
+        }
+      }
+    }
+  }
+  return true;
+}
 
 //Funções de construção das estruturas de dados
 grafoVector constroiVector(string arquivo){
@@ -1808,15 +1948,163 @@ int HopcroftkarpMatriz(grafoMatriz grafo, bool salve=false){
   return result;
 }
 
+//Funções para Vetor de Adjacência com peso
+void bellmanfordVector(grafoVectorComPeso grafo, bool salve=false){
+  if(!grafo.directed){
+    cout<<"O grafo não é direcionado"<<endl;
+    return;
+  }
+  vector<vector<double> > distance (grafo.numVertices+1);
+  for (int i=1; i<grafo.numVertices+1;i++){
+    if (bfCoreVector(grafo, i)){
+      distance[i].insert(distance[i].end(), d.begin(), d.end());
+    }
+    d.clear();
+  }
+  if(salve){
+    ofstream bellmanfordFile;
+    bellmanfordFile.open("bellmanfordfile.txt");
+    //Adiciona todos os dados do algoritmo
+    for(int i=1;i<=grafo.numVertices;i++){
+      if(distance[i].empty()){
+        bellmanfordFile<<"Ciclo negativo encontrado."<<endl;
+        continue;
+      }
+      for(int j=0;j<(int)distance[i].size();j++){
+        bellmanfordFile<<distance[i][j]<<" ";
+      }
+      bellmanfordFile<<endl;
+    }
+    bellmanfordFile.close();
+  }
+
+}
+
+void spfaVector(grafoVectorComPeso grafo, bool salve=false){
+  if(!grafo.directed){
+    cout<<"O grafo não é direcionado"<<endl;
+    return;
+  }
+  double distance[grafo.numVertices+1][grafo.numVertices+1];
+  if(salve){
+
+    for(int i=1;i<=grafo.numVertices;i++){
+      for(int j=1;j<=(int)d.size();j++){
+        distance[i][j] = INF;
+      }
+    }
+  }
+
+  for(int i=1;i<=grafo.numVertices;i++){
+      if(!spfaCoreVector(grafo,i)){
+        cout<<"Há presença de Ciclo negativo"<<endl;
+        return;
+      }
+
+
+
+      d.clear();
+  }
+
+  if(salve){
+    ofstream bellmanfordFile;
+    bellmanfordFile.open("bellmanfordfile.txt");
+    //Adiciona todos os dados do algoritmo
+    for(int i=1;i<=grafo.numVertices;i++){
+      for(int j=1;j<=grafo.numVertices;j++){
+        bellmanfordFile<<distance[i][j]<<" ";
+      }
+      bellmanfordFile<<endl;
+    }
+    bellmanfordFile.close();
+  }
+
+}
+
+//Funções para Matriz de Adjacência com peso
+void bellmanfordMatriz(grafoMatrizComPeso grafo, bool salve=false){
+  if(!grafo.directed){
+    cout<<"O grafo não é direcionado"<<endl;
+    return;
+  }
+  vector<vector<double> > distance (grafo.numVertices+1);
+  for (int i=1; i<grafo.numVertices+1;i++){
+    if (bfCoreMatriz(grafo, i)){
+      distance[i].insert(distance[i].end(), d.begin(), d.end());
+    }
+    d.clear();
+  }
+  if(salve){
+    ofstream bellmanfordFile;
+    bellmanfordFile.open("bellmanfordfile.txt");
+    //Adiciona todos os dados do algoritmo
+    for(int i=1;i<=grafo.numVertices;i++){
+      if(distance[i].empty()){
+        bellmanfordFile<<"Ciclo negativo encontrado."<<endl;
+        continue;
+      }
+      for(int j=0;j<(int)distance[i].size();j++){
+        bellmanfordFile<<distance[i][j]<<" ";
+      }
+      bellmanfordFile<<endl;
+    }
+    bellmanfordFile.close();
+  }
+}
+
+void spfaMatriz(grafoMatrizComPeso grafo, bool salve=false){
+  if(!grafo.directed){
+    cout<<"O grafo não é direcionado"<<endl;
+    return;
+  }
+  double distance[grafo.numVertices+1][grafo.numVertices+1];
+  if(salve){
+
+    for(int i=1;i<=grafo.numVertices;i++){
+      for(int j=1;j<=(int)d.size();j++){
+        distance[i][j] = INF;
+      }
+    }
+  }
+
+  for(int i=1;i<=grafo.numVertices;i++){
+      if(!spfaCoreMatriz(grafo,i)){
+        cout<<"Há presença de Ciclo negativo"<<endl;
+        return;
+      }
+
+      if(salve){
+        for(int j=1;j<(int)d.size();j++){
+          distance[i][j]=d[j];
+        }
+      }
+
+      d.clear();
+  }
+
+  if(salve){
+    ofstream bellmanfordFile;
+    bellmanfordFile.open("bellmanfordfile.txt");
+    //Adiciona todos os dados do algoritmo
+    for(int i=1;i<=grafo.numVertices;i++){
+      for(int j=1;j<=grafo.numVertices;j++){
+        bellmanfordFile<<distance[i][j]<<" ";
+      }
+      bellmanfordFile<<endl;
+    }
+    bellmanfordFile.close();
+  }
+}
 
 //Utilização pelo usuário(main)
 int main(){
-  grafoVector vector = constroiVector("grafo_teste.txt");
-  grafoMatriz matriz = constroiMatriz("grafo_teste.txt");
+  grafoVectorComPeso vector = constroiVectorComPeso("teste.txt", true);
+  //grafoMatrizComPeso matriz = constroiMatrizComPeso("ER_50.txt", true);
   clock_t start = clock();
   //getchar();
-  cout<<HopcroftkarpVector(vector)<<endl;
-  cout<<HopcroftkarpMatriz(matriz)<<endl;
+  bellmanfordVector(vector, true);
+  //bellmanfordMatriz(vector,true)
+  //cout<<HopcroftkarpMatriz(matriz)<<endl;
   clock_t end = clock();
   cout<<"Tempo HopcroftKarp: "<<(double)(end-start)/CLOCKS_PER_SEC<< " segundos."<<endl;
 
