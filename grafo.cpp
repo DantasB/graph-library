@@ -13,8 +13,8 @@
 #define INF 0x3f3f3f3f //Define um valor infinito
 using namespace std;
 
-//Vetores Globais
-vector<int> pairU;
+//Definições globais
+vector<int> match;
 vector<int> dist;
 
 //Estruturas criadas
@@ -51,102 +51,6 @@ bool comparaCC(vector<int> primeiro, vector<int> segundo){
 
 bool comparaSegundo(pair<int,int> a, pair<int,int> b){
   return (a.second < b.second);
-}
-
-bool bfsHopVector(grafoVector grafo){
-  queue<int> fila;
-  for(int j=0;j<=(int)grafo.numVertices;j++){
-    dist.push_back(-1);
-  }
-  for (int u=1; u<=(int)grafo.numVertices; ++u){
-    if(pairU[u]==-1){
-      dist[u] = 0;
-      fila.push(u);
-    }
-  }
-  bool reached = false;
-  while (!fila.empty()){
-    int k = fila.front();
-    fila.pop();
-    for (int i=0; i<(int)grafo.adjVector[k].size(); i++) {
-      int v = grafo.adjVector[k][i];
-      if (pairU[v] == -1){
-        reached = true;
-      }
-      else if(dist[pairU[v]] == -1) {
-          dist[pairU[v]] = dist[k] + 1;
-          fila.push(pairU[v]);
-        }
-    }
-  }
-  return reached;
-}
-
-bool dfsHopVector(grafoVector grafo, int u) {
-  if (u == -1){
-    return true;
-  }
-  for (int i=0; i<(int)grafo.adjVector[u].size(); i++){
-    int v = grafo.adjVector[u][i];
-    if(pairU[v] == -1 || dist[pairU[v]] == dist[u]+1){
-      if (dfsHopVector(grafo, pairU[v])){
-        pairU[v] = u;
-        pairU[u] = v;
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-bool bfsHopMatriz(grafoMatriz grafo){
-  queue<int> Q;
-  for(int j=0;j<=(int)grafo.numVertices;j++){
-    dist.push_back(-1);
-  }
-  for (int u=1; u<=(int)grafo.numVertices; ++u){
-    if(pairU[u]==-1){
-      dist[u] = 0;
-      Q.push(u);
-    }
-  }
-  bool reached = false;
-  while (!Q.empty()){
-    int k = Q.front();
-    Q.pop();
-    for (int i=1; i<=grafo.numVertices; i++){
-      if (grafo.adjMatriz[k][i]){
-        int v = i;
-        if (pairU[v] == -1){
-          reached = true;
-        }
-        else if(dist[pairU[v]] == -1) {
-            dist[pairU[v]] = dist[k] + 1;
-            Q.push(pairU[v]);
-          }
-      }
-    }
-  }
-  return reached;
-}
-
-bool dfsHopMatriz(grafoMatriz grafo, int u) {
-  if (u == -1){
-    return true;
-  }
-  for (int i=1; i<=grafo.numVertices; i++){
-    if (grafo.adjMatriz[u][i]){
-      int v = i;
-      if(pairU[v] == -1 || dist[pairU[v]] == dist[u]+1){
-        if (dfsHopMatriz(grafo, pairU[v])){
-          pairU[v] = u;
-          pairU[u] = v;
-          return true;
-        }
-      }
-    }
-  }
-  return false;
 }
 
 vector<int> bfsCCMatriz(grafoMatriz grafo, int start, vector<int>&descoberto, int constante){
@@ -323,12 +227,110 @@ bool bipartidoVector(grafoVector grafo){
   return true;
 }
 
+bool bfsHopVector(grafoVector grafo){
+  queue <int> fila;
+  for(int i=0;i<=grafo.numVertices;i++){
+    dist[i] = -1;
+  }
+  for(int i=1; i<=grafo.numVertices;++i){
+    if(match[i] == -1){
+      fila.push(i);
+      dist[i] =0;
+    }
+  }
+  bool chegueiPORRA = false;
+  while(!fila.empty()){
+    int n = fila.front();
+    fila.pop();
+    for(int i=0;i<(int)grafo.adjVector[n].size();i++){
+      int v = grafo.adjVector[n][i];
+      if(match[v]== -1){
+        chegueiPORRA = true;
+      }
+      else if (dist[match[v]] == -1){
+        dist[match[v]] = dist[n] +1;
+        fila.push(match[v]);
+      }
+    }
+  }
+  return chegueiPORRA;
+}
+
+bool dfsHopVector(grafoVector grafo, int n){
+  if( n == -1 ){
+    return true;
+  }
+  for(int i=0;i<(int)grafo.adjVector[n].size();i++){
+    int v = grafo.adjVector[n][i];
+    if((match[v] == -1) || (dist[match[v]] == dist[n] +1)){
+      if(dfsHopVector(grafo,match[v])){
+        match[v] = n;
+        match[n] = v;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool bfsHopMatriz(grafoMatriz grafo){
+  queue <int> fila;
+  for(int i=0;i<=grafo.numVertices;i++){
+    dist[i] = -1;
+  }
+  for(int i=1; i<=grafo.numVertices;++i){
+    if(match[i] == -1){
+      fila.push(i);
+      dist[i] =0;
+    }
+  }
+  bool chegueiPORRA = false;
+  while(!fila.empty()){
+    int n = fila.front();
+    fila.pop();
+    for(int i=1;i<(int)grafo.numVertices+1;i++){
+      if(grafo.adjMatriz[n][i]){
+        int v = i;
+        if(match[v]== -1){
+          chegueiPORRA = true;
+        }
+        else if (dist[match[v]] == -1){
+          dist[match[v]] = dist[n] +1;
+          fila.push(match[v]);
+        }
+      }
+    }
+  }
+  return chegueiPORRA;
+}
+
+bool dfsHopMatriz(grafoMatriz grafo, int n){
+  if( n == -1 ){
+    return true;
+  }
+  for(int i=1;i<grafo.numVertices+1;i++){
+    if(grafo.adjMatriz[n][i]){
+      int v = i;
+      if((match[v] == -1) || (dist[match[v]] == dist[n] +1)){
+        if(dfsHopMatriz(grafo,match[v])){
+          match[v] = n;
+          match[n] = v;
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
 //Funções de construção das estruturas de dados
 grafoVector constroiVector(string arquivo){
   grafoVector grafo;
   int numVertices;
   int *grau;
   vector <int> *adjVector;
+  vector<int> bipartite_1;
+  vector<int> bipartite_2;
   int numArestas=0;
   int vertex1, vertex2;
   bool bipartido;
@@ -383,7 +385,61 @@ grafoVector constroiVector(string arquivo){
   graphFile.close();
   grafo.adjVector = adjVector;
   bipartido = bipartidoVector(grafo);
+
+  if(bipartido){
+    int *visited;
+    visited = new int[grafo.numVertices+1];
+    //Define o vetor visitado = 0
+    for(int i=0;i<=grafo.numVertices+1;i++){
+      visited[i] = 0;
+    }
+    //Cria uma fila
+    queue<int> fila;
+    int start = 1;
+    //Adiciona o start a fila
+    fila.push(start);
+    //Define o visited do start como 1
+    visited[start]=1;
+    //Enquanto a fila não estiver vazia
+    while(!fila.empty()){
+      //Tira o primeiro elemento da fila
+      int v = fila.front();
+      //cout<<v<<endl;
+      fila.pop();
+      //Para todos os vizinhos da fila
+      for(int i=0;i<(int)grafo.adjVector[v].size();i++){
+        if(visited[grafo.adjVector[v][i]]==0){
+          if (visited[v] == 1){
+            visited[grafo.adjVector[v][i]] = 2;
+          }
+          else{
+            if(visited[v] ==2){
+              visited[grafo.adjVector[v][i]] = 1;
+            }
+          }
+          fila.push(grafo.adjVector[v][i]);
+        }
+      }
+    }
+    for(int i=0;i<grafo.numVertices+1;i++){
+      if(visited[i]==1){
+        bipartite_1.push_back(i);
+      }
+      if(visited[i]==2){
+        bipartite_2.push_back(i);
+      }
+    }
+  }
+
   grafo.bipartido = bipartido;
+  grafo.bipartite_1 = bipartite_1;
+  grafo.bipartite_2 = bipartite_2;
+
+  for(int i=0;i<=grafo.numVertices;i++){
+    match.push_back(-1);
+    dist.push_back(-1);
+  }
+
   return grafo;
 }
 
@@ -392,6 +448,8 @@ grafoMatriz constroiMatriz(string arquivo){
   int numVertices;
   bool **adjMatriz;
   int *grau;
+  vector<int>bipartite_1;
+  vector<int>bipartite_2;
   int numArestas=0;
   int vertex1, vertex2;
   bool bipartido;
@@ -459,6 +517,63 @@ grafoMatriz constroiMatriz(string arquivo){
 
   bipartido = bipartidoMatriz(grafo);
   grafo.bipartido = bipartido;
+
+  if(bipartido){
+    //Cria um vetor de visitados
+    int *visited;
+    visited = new int[grafo.numVertices+1];
+    //Define o vetor visitado = 0
+    for(int i=0;i<=grafo.numVertices+1;i++){
+      visited[i] = 0;
+    }
+    //Cria uma fila
+    queue<int> fila;
+    int start = 1;
+    //Adiciona o start a fila
+    fila.push(start);
+    //Define o visited do start como 1
+    visited[start]=1;
+    //Enquanto a fila não estiver vazia
+    while(!fila.empty()){
+      //Tira o primeiro elemento da fila
+      int v = fila.front();
+      //cout<<v<<endl;
+      fila.pop();
+      //Para todos os vizinhos da fila
+      for(int i=1;i<(int)grafo.numVertices+1;i++){
+        if(grafo.adjMatriz[v][i]){
+          if(visited[i]==0){
+            if (visited[v] == 1){
+              visited[i] = 2;
+            }
+            else{
+              if(visited[v] ==2){
+                visited[i] = 1;
+              }
+            }
+            fila.push(i);
+          }
+        }
+      }
+    }
+
+    for(int i=0;i<grafo.numVertices+1;i++){
+      if(visited[i]==1){
+        bipartite_1.push_back(i);
+      }
+      if(visited[i]==2){
+        bipartite_2.push_back(i);
+      }
+    }
+  }
+
+  grafo.bipartite_1 = bipartite_1;
+  grafo.bipartite_2 = bipartite_2;
+
+  for(int i=0;i<=grafo.numVertices;i++){
+    match.push_back(-1);
+    dist.push_back(-1);
+  }
 
   return grafo;
 }
@@ -533,20 +648,6 @@ grafoMatrizComPeso constroiMatrizComPeso(string arquivo, bool directed=false){
 
   grafo.adjMatriz = adjMatriz;
 
-  //Imprime o grafo construido.
-  /*
-  for (int u = 0; u <= numVertices; u++) {
-    cout << "Nó " << u << " faz adjacência com \n";
-    for (int j=0; j<= numVertices;j++)
-    {
-      if (adjMatriz[u][j]>0){
-        cout << "\tNó " << j << " Cujo peso da aresta ="
-             << adjMatriz[u][j] << "\n";
-      }
-    }
-    cout << "\n";
-  }
-  */
   return grafo;
 }
 
@@ -615,21 +716,6 @@ grafoVectorComPeso constroiVectorComPeso(string arquivo, bool directed=false){
   graphFile<<"Essa é a mediana do grau: "<<mediana<<endl;
   graphFile.close();
   grafo.adjVector = adjVector;
-  //Imprime o grafo construido.
-  /*
-  double v, w;
-  for (int u = 1; u <= numVertices; u++) {
-    cout << "Nó " << u << " faz adjacência com \n";
-    for (auto it = adjVector[u].begin(); it!=adjVector[u].end(); it++)
-    {
-        v = it->first;
-        w = it->second;
-        cout << "\tNó " << v << " Cujo peso da aresta ="
-             << w << "\n";
-    }
-    cout << "\n";
-  }
-  */
   return grafo;
 }
 
@@ -1640,19 +1726,16 @@ double eccentricityVector(grafoVectorComPeso grafo, int start){
 }
 
 //Funções para Vetor de Adjacência grafos bipartidos
-
-int hopcroftKarpVector(grafoVector grafo, bool salve=false){
+int HopcroftkarpVector(grafoVector grafo, bool salve=false){
   if(!grafo.bipartido){
+    cout<<"O grafo não é bipartido"<<endl;
     return 0;
   }
-  for (int u=0; u<=(int)grafo.numVertices; u++){
-    pairU.push_back(-1);
-  }
-  int result = 0;
-  while (bfsHopVector(grafo)){
-    for (int u=1; u<=(int)grafo.numVertices; ++u){
-      if (pairU[u]==-1 && dfsHopVector(grafo, u)){
-        result++;
+  int result =0;
+  while(bfsHopVector(grafo)){
+    for(int i=1;i<=grafo.numVertices;++i){
+      if(match[i] == -1 && dfsHopVector(grafo,i)){
+        ++result;
       }
     }
   }
@@ -1663,8 +1746,8 @@ int hopcroftKarpVector(grafoVector grafo, bool salve=false){
     matchingFile.open("matchingfile.txt");
     //Adiciona todos os dados do emparelhamento
     for(int i=1;i<grafo.numVertices+1;i++){
-      if (pairU[i] > 0){
-        matchingFile<< i <<" "<< pairU[i]<<" "<<endl;
+      if (match[i] > 0){
+        matchingFile<< i <<" "<< match[i]<<endl;
       }
     }
     //Fecha o arquivo
@@ -1674,49 +1757,45 @@ int hopcroftKarpVector(grafoVector grafo, bool salve=false){
 }
 
 //Funções para Matriz de Adjacência grafos bipartidos
-
-int hopcroftKarpMatriz(grafoMatriz grafo, bool salve=false){
+int HopcroftkarpMatriz(grafoMatriz grafo, bool salve=false){
   if(!grafo.bipartido){
+    cout<<"O grafo não é bipartido"<<endl;
     return 0;
   }
-  for (int u=0; u<(int)grafo.numVertices+1; u++){
-    pairU.push_back(-1);
-  }
-  int result = 0;
-  while (bfsHopMatriz(grafo)){
-    for (int u=1; u<=(int)grafo.numVertices; ++u){
-      if (pairU[u]==-1 && dfsHopMatriz(grafo, u)){
-        result++;
+  int result =0;
+  while(bfsHopMatriz(grafo)){
+    for(int i=1;i<=grafo.numVertices;++i){
+      if(match[i] == -1 && dfsHopMatriz(grafo,i)){
+        ++result;
       }
     }
   }
   //Se o usuário escolher salvar
   if(salve){
-    //Cria um arquivo matchingFile
-    ofstream matchingFile;
-    matchingFile.open("matchingfile.txt");
-    //Adiciona todos os dados do emparelhamento
-    for(int i=1;i<grafo.numVertices+1;i++){
-      if (pairU[i] > 0){
-        matchingFile<< i <<" "<< pairU[i]<<" "<<endl;
-      }
+  //Cria um arquivo matchingFile
+  ofstream matchingFile;
+  matchingFile.open("matchingfile.txt");
+  //Adiciona todos os dados do emparelhamento
+  for(int i=1;i<grafo.numVertices+1;i++){
+    if (match[i] > 0){
+      matchingFile<< i <<" "<< match[i]<<endl;
     }
-    //Fecha o arquivo
-    matchingFile.close();
   }
-
+  //Fecha o arquivo
+  matchingFile.close();
+}
   return result;
 }
 
 //Utilização pelo usuário(main)
 int main(){
-  grafoVector vector = constroiVector("teste.txt");
+  grafoVector vector = constroiVector("grafo_teste.txt");
   cout<<vector.bipartido<<endl;
   clock_t start = clock();
   //getchar();
-  cout<<hopcroftKarpVector(vector)<<endl;
+  cout<<HopcroftkarpVector(vector)<<endl;
   clock_t end = clock();
   cout<<"Tempo HopcroftKarp: "<<(double)(end-start)/CLOCKS_PER_SEC<< " segundos."<<endl;
 
-
 }
+
