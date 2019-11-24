@@ -1761,9 +1761,10 @@ int HopcroftkarpVector(grafoVector grafo, bool salve=false){
     ofstream matchingFile;
     matchingFile.open("matchingfile.txt");
     //Adiciona todos os dados do emparelhamento
-    for(int i=1;i<grafo.numVertices+1;i++){
-      if (match[i] > 0){
-        matchingFile<< i <<" "<< match[i]<<endl;
+    matchingFile<< "Tamanho máximo do emparalhamento: "<< result<<endl;
+    for(int v: grafo.bipartite_1){
+      if (match[v] != v){
+        matchingFile<< v <<" "<< match[v]<<endl;
       }
     }
     //Fecha o arquivo
@@ -1795,9 +1796,10 @@ int HopcroftkarpMatriz(grafoMatriz grafo, bool salve=false){
   ofstream matchingFile;
   matchingFile.open("matchingfile.txt");
   //Adiciona todos os dados do emparelhamento
-  for(int i=1;i<grafo.numVertices+1;i++){
-    if (match[i] > 0){
-      matchingFile<< i <<" "<< match[i]<<endl;
+  matchingFile<< "Tamanho máximo do emparalhamento: "<< result<<endl;
+  for(int v: grafo.bipartite_1){
+    if (match[v] != v){
+      matchingFile<< v <<" "<< match[v]<<endl;
     }
   }
   //Fecha o arquivo
