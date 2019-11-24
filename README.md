@@ -1,5 +1,5 @@
 # Graph-Library
-A library constructed using c++17 and some others libraries made by Bruno Dantas and Eduardo Guedes.
+A library constructed using c++11 and some others libraries made by Bruno Dantas and Eduardo Guedes.
 
 ## Table of Contents:
 - [How to use](#how-to-use)
