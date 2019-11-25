@@ -337,9 +337,8 @@ bool bfCoreMatriz(grafoMatrizComPeso grafo, int start){
   int res = 0;
   d.assign(n, INF);
   bool p;
-  p = false;
   d[start] = 0;
-  for(int i=0;i<grafo.numVertices-1;i++){
+  for(int i=0;i<=grafo.numVertices;i++){
     p = false;
     for(int w=1;w<grafo.numVertices+1;w++){
       for (int v=1;v<=grafo.numVertices;v++){
@@ -348,45 +347,27 @@ bool bfCoreMatriz(grafoMatrizComPeso grafo, int start){
             d[v] = d[w] + grafo.adjMatriz[w][v];
             p=true;
           }
-          else{
-            p=false;
-          }
         }
       }
-      if (p==false){
+      if (!p){
         break;
       }
     }
-  }
-  for(int i=0;i<(int)d.size();i++){
-    if(d[i]==INF){
-        res++;
+    if(i == grafo.numVertices && p){
+       return false;
     }
-  }
-  if(res == (int)d.size()-2){
-    return true;
   }
 
-  for (int i=1; i<grafo.numVertices+1;i++){
-    for (int j=1;j<grafo.numVertices+1;j++){
-      if (grafo.adjMatriz[i][j]!=INF){
-        if (d[j] > d[i] + grafo.adjMatriz[i][j]){
-          return false;
-        }
-      }
-    }
-  }
   return true;
 }
 
 bool bfCoreVector(grafoVectorComPeso grafo, int start){
-  int res = 0;
+
   int n = grafo.numVertices+1;
   d.assign(n, INF);
   bool p;
-  p = false;
   d[start] = 0;
-  for(int i=1;i<grafo.numVertices-1;i++){
+  for(int i=0;i<=grafo.numVertices;i++){
     p = false;
     for(int w=1;w<grafo.numVertices+1;w++){
       for (vector <pair <int,double> > ::iterator it = grafo.adjVector[w].begin(); it!=grafo.adjVector[w].end(); ++it){
@@ -396,33 +377,15 @@ bool bfCoreVector(grafoVectorComPeso grafo, int start){
           d[vizinho] = d[w] + peso;
           p=true;
         }
-        else{
-          p=false;
-        }
-        if (p==false){
+        if (!p){
           break;
         }
       }
     }
-  }
-  for(int i=1;i<(int)d.size();i++){
-    if(d[i]==INF){
-        res++;
+    if(i == grafo.numVertices && p){
+       return false;
     }
-  }
-  if(res == (int)d.size()-2){
-    return true;
-  }
-
-  for (int i=1; i<grafo.numVertices+1;i++){
-    for (vector <pair <int,double> > ::iterator it = grafo.adjVector[i].begin(); it!=grafo.adjVector[i].end(); ++it){
-      int vizinho = it->first;
-      double peso = it->second;
-      if (d[vizinho] > d[i] + peso){
-        return false;
-      }
-    }
-  }
+   }
   return true;
 }
 
@@ -2094,11 +2057,9 @@ void spfaMatriz(grafoMatrizComPeso grafo, bool salve=false){
 //Utilização pelo usuário(main)
 int main(){
   grafoVectorComPeso vector = constroiVectorComPeso("teste.txt", true);
-  grafoMatrizComPeso matriz = constroiMatrizComPeso("teste.txt", true);
   clock_t start = clock();
   //getchar();
-  spfaVector(vector, true);
-  //bellmanfordVector(vector,true);
+  bellmanfordVector(vector,true);
   //cout<<HopcroftkarpMatriz(matriz)<<endl;
   clock_t end = clock();
   cout<<"Tempo HopcroftKarp: "<<(double)(end-start)/CLOCKS_PER_SEC<< " segundos."<<endl;
