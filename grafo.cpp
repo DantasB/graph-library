@@ -334,6 +334,7 @@ bool dfsHopMatriz(grafoMatriz grafo, int n){
 
 bool bfCoreMatriz(grafoMatrizComPeso grafo, int start){
   int n = grafo.numVertices+1;
+  int res = 0;
   d.assign(n, INF);
   bool p;
   p = false;
@@ -357,6 +358,15 @@ bool bfCoreMatriz(grafoMatrizComPeso grafo, int start){
       }
     }
   }
+  for(int i=0;i<(int)d.size();i++){
+    if(d[i]==INF){
+        res++;
+    }
+  }
+  if(res == (int)d.size()-2){
+    return true;
+  }
+
   for (int i=1; i<grafo.numVertices+1;i++){
     for (int j=1;j<grafo.numVertices+1;j++){
       if (grafo.adjMatriz[i][j]!=INF){
@@ -370,18 +380,19 @@ bool bfCoreMatriz(grafoMatrizComPeso grafo, int start){
 }
 
 bool bfCoreVector(grafoVectorComPeso grafo, int start){
+  int res = 0;
   int n = grafo.numVertices+1;
   d.assign(n, INF);
   bool p;
   p = false;
   d[start] = 0;
-  for(int i=0;i<grafo.numVertices-1;i++){
+  for(int i=1;i<grafo.numVertices-1;i++){
     p = false;
-    for(int w=0;w<(int)grafo.adjVector[i].size();w++){
+    for(int w=1;w<grafo.numVertices+1;w++){
       for (vector <pair <int,double> > ::iterator it = grafo.adjVector[w].begin(); it!=grafo.adjVector[w].end(); ++it){
         int vizinho = it->first;
         double peso = it->second;
-        if (d[vizinho] > d[w] + peso){
+        if (d[w] != INF && d[vizinho] > d[w] + peso){
           d[vizinho] = d[w] + peso;
           p=true;
         }
@@ -394,7 +405,16 @@ bool bfCoreVector(grafoVectorComPeso grafo, int start){
       }
     }
   }
-  for (int i=0; i<grafo.numVertices+1;i++){
+  for(int i=1;i<(int)d.size();i++){
+    if(d[i]==INF){
+        res++;
+    }
+  }
+  if(res == (int)d.size()-2){
+    return true;
+  }
+
+  for (int i=1; i<grafo.numVertices+1;i++){
     for (vector <pair <int,double> > ::iterator it = grafo.adjVector[i].begin(); it!=grafo.adjVector[i].end(); ++it){
       int vizinho = it->first;
       double peso = it->second;
@@ -1970,7 +1990,7 @@ void bellmanfordVector(grafoVectorComPeso grafo, bool salve=false){
         bellmanfordFile<<"Ciclo negativo encontrado."<<endl;
         continue;
       }
-      for(int j=0;j<(int)distance[i].size();j++){
+      for(int j=1;j<(int)distance[i].size();j++){
         bellmanfordFile<<distance[i][j]<<" ";
       }
       bellmanfordFile<<endl;
@@ -1985,40 +2005,29 @@ void spfaVector(grafoVectorComPeso grafo, bool salve=false){
     cout<<"O grafo não é direcionado"<<endl;
     return;
   }
-  double distance[grafo.numVertices+1][grafo.numVertices+1];
-  if(salve){
-
-    for(int i=1;i<=grafo.numVertices;i++){
-      for(int j=1;j<=(int)d.size();j++){
-        distance[i][j] = INF;
-      }
-    }
-  }
-
+  vector<vector<double> > distance (grafo.numVertices+1);
   for(int i=1;i<=grafo.numVertices;i++){
-      if(!spfaCoreVector(grafo,i)){
-        cout<<"Há presença de Ciclo negativo"<<endl;
-        return;
+      if(spfaCoreVector(grafo,i)){
+        distance[i].insert(distance[i].end(), d.begin(), d.end());
       }
-
-
-
       d.clear();
   }
-
   if(salve){
     ofstream bellmanfordFile;
     bellmanfordFile.open("bellmanfordfile.txt");
     //Adiciona todos os dados do algoritmo
     for(int i=1;i<=grafo.numVertices;i++){
-      for(int j=1;j<=grafo.numVertices;j++){
+      if(distance[i].empty()){
+        bellmanfordFile<<"Ciclo negativo encontrado."<<endl;
+        continue;
+      }
+      for(int j=1;j<(int)distance[i].size();j++){
         bellmanfordFile<<distance[i][j]<<" ";
       }
       bellmanfordFile<<endl;
     }
     bellmanfordFile.close();
   }
-
 }
 
 //Funções para Matriz de Adjacência com peso
@@ -2043,7 +2052,7 @@ void bellmanfordMatriz(grafoMatrizComPeso grafo, bool salve=false){
         bellmanfordFile<<"Ciclo negativo encontrado."<<endl;
         continue;
       }
-      for(int j=0;j<(int)distance[i].size();j++){
+      for(int j=1;j<(int)distance[i].size();j++){
         bellmanfordFile<<distance[i][j]<<" ";
       }
       bellmanfordFile<<endl;
@@ -2057,37 +2066,23 @@ void spfaMatriz(grafoMatrizComPeso grafo, bool salve=false){
     cout<<"O grafo não é direcionado"<<endl;
     return;
   }
-  double distance[grafo.numVertices+1][grafo.numVertices+1];
-  if(salve){
-
-    for(int i=1;i<=grafo.numVertices;i++){
-      for(int j=1;j<=(int)d.size();j++){
-        distance[i][j] = INF;
-      }
-    }
-  }
-
+  vector<vector<double> > distance (grafo.numVertices+1);
   for(int i=1;i<=grafo.numVertices;i++){
-      if(!spfaCoreMatriz(grafo,i)){
-        cout<<"Há presença de Ciclo negativo"<<endl;
-        return;
+      if(spfaCoreMatriz(grafo,i)){
+        distance[i].insert(distance[i].end(), d.begin(), d.end());
       }
-
-      if(salve){
-        for(int j=1;j<(int)d.size();j++){
-          distance[i][j]=d[j];
-        }
-      }
-
       d.clear();
   }
-
   if(salve){
     ofstream bellmanfordFile;
     bellmanfordFile.open("bellmanfordfile.txt");
     //Adiciona todos os dados do algoritmo
     for(int i=1;i<=grafo.numVertices;i++){
-      for(int j=1;j<=grafo.numVertices;j++){
+      if(distance[i].empty()){
+        bellmanfordFile<<"Ciclo negativo encontrado."<<endl;
+        continue;
+      }
+      for(int j=1;j<(int)distance[i].size();j++){
         bellmanfordFile<<distance[i][j]<<" ";
       }
       bellmanfordFile<<endl;
@@ -2099,11 +2094,11 @@ void spfaMatriz(grafoMatrizComPeso grafo, bool salve=false){
 //Utilização pelo usuário(main)
 int main(){
   grafoVectorComPeso vector = constroiVectorComPeso("teste.txt", true);
-  //grafoMatrizComPeso matriz = constroiMatrizComPeso("ER_50.txt", true);
+  grafoMatrizComPeso matriz = constroiMatrizComPeso("teste.txt", true);
   clock_t start = clock();
   //getchar();
-  bellmanfordVector(vector, true);
-  //bellmanfordMatriz(vector,true)
+  spfaVector(vector, true);
+  //bellmanfordVector(vector,true);
   //cout<<HopcroftkarpMatriz(matriz)<<endl;
   clock_t end = clock();
   cout<<"Tempo HopcroftKarp: "<<(double)(end-start)/CLOCKS_PER_SEC<< " segundos."<<endl;
