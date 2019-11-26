@@ -142,34 +142,37 @@ bool bipartidoMatriz(grafoMatriz grafo){
   }
   //Cria uma fila
   queue<int> fila;
-  int start = 1;
-  //Adiciona o start a fila
-  fila.push(start);
-  //Define o visited do start como 1
-  visited[start]=1;
-  //Enquanto a fila não estiver vazia
-  while(!fila.empty()){
-    //Tira o primeiro elemento da fila
-    int v = fila.front();
-    //cout<<v<<endl;
-    fila.pop();
-    //Para todos os vizinhos da fila
-    for(int i=1;i<(int)grafo.numVertices+1;i++){
-      if(grafo.adjMatriz[v][i]){
-        if(visited[i]==0){
-          if (visited[v] == 1){
-            visited[i] = 2;
+  for(int start=1;start<=grafo.numVertices;start++){
+    if(!visited[start]){
+      //Adiciona o start a fila
+      fila.push(start);
+      //Define o visited do start como 1
+      visited[start]=1;
+    }
+    //Enquanto a fila não estiver vazia
+    while(!fila.empty()){
+      //Tira o primeiro elemento da fila
+      int v = fila.front();
+      //cout<<v<<endl;
+      fila.pop();
+      //Para todos os vizinhos da fila
+      for(int i=1;i<(int)grafo.numVertices+1;i++){
+        if(grafo.adjMatriz[v][i]){
+          if(visited[i]==0){
+            if (visited[v] == 1){
+              visited[i] = 2;
+            }
+            else{
+              if(visited[v] ==2){
+                visited[i] = 1;
+              }
+            }
+            fila.push(i);
           }
           else{
-            if(visited[v] ==2){
-              visited[i] = 1;
+            if(visited[i] == visited[v]){
+              return false;
             }
-          }
-          fila.push(i);
-        }
-        else{
-          if(visited[i] == visited[v]){
-            return false;
           }
         }
       }
@@ -199,33 +202,36 @@ bool bipartidoVector(grafoVector grafo){
   }
   //Cria uma fila
   queue<int> fila;
-  int start = 1;
-  //Adiciona o start a fila
-  fila.push(start);
-  //Define o visited do start como 1
-  visited[start]=1;
-  //Enquanto a fila não estiver vazia
-  while(!fila.empty()){
-    //Tira o primeiro elemento da fila
-    int v = fila.front();
-    //cout<<v<<endl;
-    fila.pop();
-    //Para todos os vizinhos da fila
-    for(int i=0;i<(int)grafo.adjVector[v].size();i++){
-      if(visited[grafo.adjVector[v][i]]==0){
-        if (visited[v] == 1){
-          visited[grafo.adjVector[v][i]] = 2;
+  for(int start=1;start<=grafo.numVertices;start++){
+    if(!visited[start]){
+      //Adiciona o start a fila
+      fila.push(start);
+      //Define o visited do start como 1
+      visited[start]=1;
+    }
+    //Enquanto a fila não estiver vazia
+    while(!fila.empty()){
+      //Tira o primeiro elemento da fila
+      int v = fila.front();
+      //cout<<v<<endl;
+      fila.pop();
+      //Para todos os vizinhos da fila
+      for(int i=0;i<(int)grafo.adjVector[v].size();i++){
+        if(visited[grafo.adjVector[v][i]]==0){
+          if (visited[v] == 1){
+            visited[grafo.adjVector[v][i]] = 2;
+          }
+          else{
+            if(visited[v] ==2){
+              visited[grafo.adjVector[v][i]] = 1;
+            }
+          }
+          fila.push(grafo.adjVector[v][i]);
         }
         else{
-          if(visited[v] ==2){
-            visited[grafo.adjVector[v][i]] = 1;
+          if(visited[grafo.adjVector[v][i]] == visited[v]){
+            return false;
           }
-        }
-        fila.push(grafo.adjVector[v][i]);
-      }
-      else{
-        if(visited[grafo.adjVector[v][i]] == visited[v]){
-          return false;
         }
       }
     }
