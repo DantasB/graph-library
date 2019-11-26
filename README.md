@@ -115,7 +115,7 @@ The [colaboradores.cpp](https://github.com/DantasB/Graph-Library/blob/master/col
   - [grafo_teste_8.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_teste_8.txt)
   - [grafo_teste_9.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_teste_9.txt)
   - [grafo_teste_10.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_teste_10.txt)
- - Weighted graph (negative weights):
+- Weighted graph (negative weights):
   - [ER_50.txt](https://www.cos.ufrj.br/~daniel/grafos/data/ER_50.txt)
   - [ER_100.txt](https://www.cos.ufrj.br/~daniel/grafos/data/ER_100.txt)
   - [ER_500.txt](https://www.cos.ufrj.br/~daniel/grafos/data/ER_500.txt)
