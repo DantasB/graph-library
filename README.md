@@ -19,6 +19,9 @@ A library constructed using c++11 and some others libraries made by Bruno Dantas
   - [Dijkstra](#dijkstra)
   - [Prim](#prim)
   - [Eccentricity](#eccentricity)
+  - [Bipartido](#bipartido)
+  - [Maximum Matching](#maximum-matching)
+  - [Bellman Ford](#bellman-ford)
 - [Extra](#extra)
 - [Case Studies](#case-studies)
 
@@ -30,13 +33,13 @@ The library have two constructor methods that return us a type grafo. This type 
 This method construct the representation of [Adjacency Vector](#adjacency-vector) and write every information of the graph in a txt file named (graphfile). This method returns a grafoVector type, so, be careful on define the variables.
 
 ### Method constroiVectorComPeso
-Like the [constroiVector](#method-constroiVector), this method construct the representation of [Adjacency Vector](#adjacency-vector) and write every information of the graph in a txt file named (graphfile). The main difference is that the data structure is representes using Array of Vector and the Vector contains a pair (neighbor, weight).This method returns a grafoVectorComPeso type. 
+Like the [constroiVector](#method-constroiVector), this method construct the representation of [Adjacency Vector](#adjacency-vector) and write every information of the graph in a txt file named (graphfile). The main difference is that the data structure is representes using Array of Vector and the Vector contains a pair (neighbor, weight). One of the features is that the user can choose a directed graph or not, just setting a boolean true or false in the constructor function.This method returns a grafoVectorComPeso type.
 
 ### Method constroiMatriz
 This method construct the representation of [Adjacency Matrix](#adjacency-matrix) and like the [Method constroiVector](#method-constroiVector) it writes a txt file named graphfile. This method returns a grafoMatriz type.
 
 ### Method constroiMatrizComPeso
-Like the [constroiVector](#method-constroiVector), this method construct the representation of [Adjacency Matrix](#adjacency-matrix) and write every information of the graph in a txt file named (graphfile). The main difference is that the data structure is representes using 2D array of integers, that the integer represent the weight between the vertex.This method returns a grafoMatrizComPeso type. 
+Like the [constroiVector](#method-constroiVector), this method construct the representation of [Adjacency Matrix](#adjacency-matrix) and write every information of the graph in a txt file named (graphfile). The main difference is that the data structure is representes using 2D array of integers, that the integer represent the weight between the vertex. One of the features is that the user can choose a directed graph or not, just setting a boolean true or false in the constructor function. This method returns a grafoMatrizComPeso type. 
 
 ## Representations
 This library can represent graphs using Adjacency Vector and Adjacency Matrix.
@@ -75,6 +78,15 @@ The Prim is a algorithm able to build a MST (Minimum Spanning Tree).It's like th
 ### Eccentricity
 The Eccentricity is the longest shortest path between 2 vertex. In this implementation, it calculates the Eccentricity of a given vertex, so it just uses the [Dijkstra](#dijkstra) algorithm and pick up the longest distance in the distancia vector(Vector that contains the information of every distance from start vertex).
 
+### Bipartido
+The Bipartido (Bipartite) function return trues if the graph is possible to became bipartite, so, it runs a [BFS](#bfs) through every vertex non colored in the graph, and try to color it with 2 colors. If it's possible, returns true.
+
+### Maximum Matching
+This is a common problem that you can check the maximum number of matchings in a bipartite graph. The algorithm used was developed by John Hopcroft and Richard Karp. So, it returns the number of maximum matchings and, if the user wants, it can return every matches founded.
+
+### Bellman Ford
+This is an algorithm similar to Dijkstra, but it works if the graph has edges with negative weights. The implementation of Bellman Ford was optimized, them it takes O(nm) for one run of the algorithm. But, it was required to run the algorithm |V| times, so, the real complexity of this implementation is O(|V|nm), where |V| and n are the same thing. The return of this function (if the user wants) is a Matrix that represents the distances founded in the bellman-ford run, where distance[i][j] represents the distance of the vertex i to the vertex j. Also this function, can detect if the graph has negative cycles in a path.
+
 ## Extra
 The [colaboradores.cpp](https://github.com/DantasB/Graph-Library/blob/master/colaboradores.cpp) have the same implementation of the [graph.cpp](https://github.com/DantasB/Graph-Library/blob/master/grafo.cpp), but the data structure uses strings instead of integers. That's why one of the cases given by our professor had this requirement.
 
@@ -92,4 +104,21 @@ The [colaboradores.cpp](https://github.com/DantasB/Graph-Library/blob/master/col
   - [grafo_5.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_5.txt)
   - [rede_colaboracao.txt](https://www.cos.ufrj.br/~daniel/grafos/data/rede_colaboracao.txt)
   - [rede_colaboracao_vertices.txt](https://www.cos.ufrj.br/~daniel/grafos/data/rede_colaboracao_vertices.txt)
-
+- Bipartite graph:
+  - [grafo_teste_1.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_teste_1.txt)
+  - [grafo_teste_2.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_teste_2.txt)
+  - [grafo_teste_3.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_teste_3.txt)
+  - [grafo_teste_4.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_teste_4.txt)
+  - [grafo_teste_5.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_teste_5.txt)
+  - [grafo_teste_6.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_teste_6.txt)
+  - [grafo_teste_7.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_teste_7.txt)
+  - [grafo_teste_8.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_teste_8.txt)
+  - [grafo_teste_9.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_teste_9.txt)
+  - [grafo_teste_10.txt](https://www.cos.ufrj.br/~daniel/grafos/data/grafo_teste_10.txt)
+ - Weighted graph (negative weights):
+  -[ER_50.txt](https://www.cos.ufrj.br/~daniel/grafos/data/ER_50.txt)
+  -[ER_100.txt](https://www.cos.ufrj.br/~daniel/grafos/data/ER_100.txt)
+  -[ER_500.txt](https://www.cos.ufrj.br/~daniel/grafos/data/ER_500.txt)
+  -[ER_1000.txt](https://www.cos.ufrj.br/~daniel/grafos/data/ER_1000.txt)
+  -[ER_1500.txt](https://www.cos.ufrj.br/~daniel/grafos/data/ER_1500.txt)
+  
