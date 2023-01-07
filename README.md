@@ -88,7 +88,7 @@ This is a common problem that you can check the maximum number of matchings in a
 This is an algorithm similar to Dijkstra, but it works if the graph has edges with negative weights. The implementation of Bellman Ford was optimized, them it takes O(nm) for one run of the algorithm. But, it was required to run the algorithm |V| times, so, the real complexity of this implementation is O(|V|nm), where |V| and n are the same thing. The return of this function (if the user wants) is a Matrix that represents the distances founded in the bellman-ford run, where distance[i][j] represents the distance of the vertex i to the vertex j. Also this function, can detect if the graph has negative cycles in a path.
 
 ## Extra
-The [colaboradores.cpp](https://github.com/DantasB/Graph-Library/blob/master/colaboradores.cpp) have the same implementation of the [graph.cpp](https://github.com/DantasB/Graph-Library/blob/master/grafo.cpp), but the data structure uses strings instead of integers. That's why one of the cases given by our professor had this requirement.
+The [colaboradores.cpp](https://github.com/DantasB/graph-library/blob/master/colaboradores.cpp) have the same implementation of the [graph.cpp](https://github.com/DantasB/graph-library/blob/master/grafo.cpp), but the data structure uses strings instead of integers. That's why one of the cases given by our professor had this requirement.
 
 ## Case Studies:
 "Below you can see all the case studies used"
